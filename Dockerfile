@@ -16,6 +16,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Set DATABASE_URL for SQLite during build
+# Uses local SQLite file during image build steps.
 ENV DATABASE_URL="file:./dev.db"
 
 # Generate Prisma client
