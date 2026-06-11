@@ -15,6 +15,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Set DATABASE_URL for SQLite during build
+ENV DATABASE_URL="file:./dev.db"
+
 # Generate Prisma client
 RUN npx prisma generate
 
