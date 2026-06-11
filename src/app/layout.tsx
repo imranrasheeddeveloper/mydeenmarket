@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,10 +8,16 @@ import AuthProvider from "@/components/AuthProvider";
 import { CurrencyProvider } from "@/components/CurrencyProvider";
 import { siteConfig } from "@/lib/data-types";
 import { getCategories } from "@/lib/data";
-import { generateOrganizationSchema, generateWebSiteSchema } from "@/lib/seo";
+import { generateOrganizationSchema, generateWebSiteSchema, generateSiteNavigationSchema } from "@/lib/seo";
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
   display: "swap",
 });
@@ -24,20 +30,49 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   keywords: [
-    "Islamic books",
-    "Quran",
-    "Hadith",
-    "Seerah",
+    // Primary keywords
+    "Islamic books online Pakistan",
+    "buy Quran online",
+    "Hadith books",
+    "Seerah books",
     "Islamic bookstore Pakistan",
     "MyDeenMarket",
-    "Islamic products",
-    "Fiqh",
-    "Tafseer",
-    "Prayer books",
+    // Product keywords
+    "Abaya online Pakistan",
+    "Tasbih buy online",
+    "Janamaz prayer mat",
+    "Zamzam water Pakistan",
+    "Talbina powder",
+    "Ihram for Hajj Umrah",
+    "Islamic fragrances",
+    "Attar perfume",
+    "Oud soap",
+    "Miswak",
+    "Islamic dates Ajwa",
+    "prayer beads",
+    // Category keywords
+    "Fiqh books",
+    "Tafseer Quran",
     "kids Islamic books",
     "Urdu Islamic books",
-    "Arabic books",
-    "online Islamic bookstore",
+    "Arabic books Pakistan",
+    "Islamic gifts",
+    "Hajj Umrah essentials",
+    "Prophetic medicine Tib e Nabvi",
+    // Long-tail keywords
+    "buy Islamic products online Pakistan",
+    "best Islamic bookstore Lahore",
+    "authentic Islamic books free delivery",
+    "online Islamic store cash on delivery",
+    "Quran with Urdu translation buy online",
+    "Sahih Bukhari buy Pakistan",
+    "Islamic gifts for Ramadan Eid",
+    "prayer mat buy online Pakistan",
+    "Zamzam water delivery Pakistan",
+    "Abaya collection Pakistan",
+    "Tasbih counter digital",
+    "Ihram cloth for men women",
+    "halal fragrances Pakistan",
   ],
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
   creator: siteConfig.name,
@@ -79,9 +114,9 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    google: "your-google-verification-code",
-  },
+  // verification: {
+  //   google: "YOUR_GOOGLE_VERIFICATION_CODE",
+  // },
   alternates: {
     canonical: siteConfig.url,
   },
@@ -94,9 +129,13 @@ export default async function RootLayout({
 }>) {
   const categories = await getCategories();
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
+    <html lang="en" className={`${inter.variable} ${playfair.variable} h-full`}>
       <head>
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -107,6 +146,12 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(generateWebSiteSchema()),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(generateSiteNavigationSchema()),
           }}
         />
       </head>

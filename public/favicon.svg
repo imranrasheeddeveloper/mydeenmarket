@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="7" fill="#d4a853"/>
+  <!-- Book base -->
+  <path d="M7 24 C7 24 12 21.5 16 21.5 C20 21.5 25 24 25 24" stroke="#fff" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  <path d="M7 24 L7 11 C7 11 11 9 16 10" stroke="#fff" stroke-width="1.5" fill="none"/>
+  <path d="M25 24 L25 11 C25 11 21 9 16 10" stroke="#fff" stroke-width="1.5" fill="none"/>
+  <!-- Arch -->
+  <path d="M10 18 L10 12 Q10 6 16 5 Q22 6 22 12 L22 18" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <!-- Crescent -->
+  <path d="M14 12 A2.8 2.8 0 1 1 14 17.5 A2.1 2.1 0 1 0 14 12Z" fill="#fff"/>
+  <!-- Star -->
+  <polygon points="20,12.5 20.5,14 22,14 20.8,15 21.2,16.5 20,15.5 18.8,16.5 19.2,15 18,14 19.5,14" fill="#fff"/>
+</svg>

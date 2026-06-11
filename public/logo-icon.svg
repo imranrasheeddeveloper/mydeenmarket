@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="14" fill="#d4a853"/>
+  <!-- Open book base -->
+  <path d="M14 48 C14 48 24 43 32 43 C40 43 50 48 50 48" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <!-- Left page -->
+  <path d="M14 48 L14 22 C14 22 22 18 32 20" stroke="#fff" stroke-width="2" fill="none"/>
+  <!-- Right page -->
+  <path d="M50 48 L50 22 C50 22 42 18 32 20" stroke="#fff" stroke-width="2" fill="none"/>
+  <!-- Spine -->
+  <line x1="32" y1="20" x2="32" y2="43" stroke="#fff" stroke-width="1.2" opacity="0.3"/>
+  <!-- Islamic arch -->
+  <path d="M19 36 L19 24 Q19 12 32 10 Q45 12 45 24 L45 36" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <!-- Inner arch -->
+  <path d="M23 36 L23 26 Q23 17 32 15 Q41 17 41 26 L41 36" stroke="#fff" stroke-width="1" fill="none" opacity="0.3"/>
+  <!-- Crescent -->
+  <path d="M28 24 A5 5 0 1 1 28 34 A3.8 3.8 0 1 0 28 24Z" fill="#fff"/>
+  <!-- Star -->
+  <polygon points="39,24.5 40,27.3 43,27.3 40.6,29.2 41.4,32 39,30.3 36.6,32 37.4,29.2 35,27.3 38,27.3" fill="#fff" opacity="0.9"/>
+</svg>

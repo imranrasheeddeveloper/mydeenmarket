@@ -5,9 +5,9 @@ import { getProducts, getCategories } from "@/lib/data";
 import { generatePageMetadata, generateBreadcrumbSchema } from "@/lib/seo";
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "All Collections",
+  title: "All Collections — Islamic Books & Products",
   description:
-    "Browse all Islamic book collections at MyDeenMarket. Quran, Hadith, Seerah, Fiqh, children's books, prayer guides, and more. Free shipping over Rs. 5,000.",
+    "Browse Islamic books, Abaya, Tasbih, Zamzam water, Ihram & more at MyDeenMarket. Free shipping over Rs. 5,000. Cash on delivery across Pakistan.",
   path: "/collections",
 });
 
@@ -116,7 +116,7 @@ export default async function CollectionsPage({
 
               {/* Filter by Type */}
               <div className="mb-6">
-                <h3 className="text-sm font-bold text-gray-900 mb-3">Filter</h3>
+                <h2 className="text-sm font-bold text-gray-900 mb-3">Filter</h2>
                 <div className="space-y-1.5">
                   <Link
                     href="/collections"
@@ -155,7 +155,7 @@ export default async function CollectionsPage({
 
               {/* Categories */}
               <div>
-                <h3 className="text-sm font-bold text-gray-900 mb-3">Categories</h3>
+                <h2 className="text-sm font-bold text-gray-900 mb-3">Categories</h2>
                 <div className="space-y-1.5">
                   {categories.map((cat) => (
                     <Link

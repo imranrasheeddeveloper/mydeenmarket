@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" fill="none">
+  <!-- Book + Arch Mark -->
+  <g>
+    <!-- Open book base -->
+    <path d="M18 58 C18 58 30 52 40 52 C50 52 62 58 62 58" stroke="#d4a853" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    <!-- Left page -->
+    <path d="M18 58 L18 26 C18 26 28 22 40 24" stroke="#d4a853" stroke-width="2" fill="none"/>
+    <!-- Right page -->
+    <path d="M62 58 L62 26 C62 26 52 22 40 24" stroke="#d4a853" stroke-width="2" fill="none"/>
+    <!-- Spine -->
+    <line x1="40" y1="24" x2="40" y2="52" stroke="#d4a853" stroke-width="1.5" opacity="0.4"/>
+    <!-- Islamic arch rising from book -->
+    <path d="M24 42 L24 28 Q24 14 40 12 Q56 14 56 28 L56 42" stroke="#d4a853" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <!-- Inner arch -->
+    <path d="M29 42 L29 30 Q29 19 40 17 Q51 19 51 30 L51 42" stroke="#d4a853" stroke-width="1.2" fill="none" opacity="0.35"/>
+    <!-- Crescent moon -->
+    <path d="M36 27 A6 6 0 1 1 36 39 A4.5 4.5 0 1 0 36 27Z" fill="#d4a853"/>
+    <!-- Star -->
+    <polygon points="48,28 49.2,31.5 53,31.5 50,33.8 51,37 48,35 45,37 46,33.8 43,31.5 46.8,31.5" fill="#d4a853" opacity="0.9"/>
+  </g>
+  <!-- Wordmark -->
+  <g>
+    <text x="72" y="38" font-family="Georgia, 'Times New Roman', serif" font-size="24" font-weight="700" fill="#0f172a" letter-spacing="-0.5">
+      MyDeen<tspan fill="#d4a853">Market</tspan>
+    </text>
+    <text x="72" y="54" font-family="Arial, Helvetica, sans-serif" font-size="8.5" font-weight="600" fill="#d4a853" letter-spacing="4" opacity="0.8">
+      ISLAMIC BOOKS
+    </text>
+  </g>
+</svg>

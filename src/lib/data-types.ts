@@ -46,9 +46,9 @@ export interface Collection {
 
 export const siteConfig = {
   name: "MyDeenMarket",
-  title: "MyDeenMarket - Islamic Books, Quran, Hadith & More",
+  title: "MyDeenMarket — Islamic Books & Products Pakistan",
   description:
-    "Pakistan's leading Islamic bookstore. Shop authentic Quran translations, Hadith collections, Seerah, Fiqh, children's Islamic books & more. Free shipping over Rs. 5,000.",
+    "Shop authentic Islamic books, Abaya, Tasbih, Zamzam water, Ihram & more at MyDeenMarket. Free shipping over Rs. 5,000. Cash on delivery across Pakistan.",
   url: "https://mydeenmarket.com",
   ogImage: "/og-image.jpg",
   address: "Shop #50, Ground Floor, Big City Plaza, Gullberg III, Lahore, Pakistan",

@@ -4,9 +4,9 @@ import { generatePageMetadata, generateBreadcrumbSchema } from "@/lib/seo";
 import Link from "next/link";
 
 export const metadata: Metadata = generatePageMetadata({
-  title: "Contact Us",
+  title: "Contact Us — MyDeenMarket Lahore",
   description:
-    "Get in touch with MyDeenMarket. Visit our store at Shop #50, Ground Floor, Big City Plaza, Gullberg III, Lahore. Call +92 303 5036392 or email info@mydeenmarket.com.",
+    "Contact MyDeenMarket for Islamic books & products. Visit Shop #50, Big City Plaza, Gullberg III, Lahore. Call +92 303 5036392.",
   path: "/contact",
 });
 

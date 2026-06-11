@@ -19,8 +19,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     });
   }
   return generatePageMetadata({
-    title: product.name,
-    description: product.description.substring(0, 160),
+    title: `${product.name} — Buy Online at Best Price`,
+    description: `${product.description.substring(0, 100)} Authentic · Fast Delivery · COD available at MyDeenMarket.`,
     path: `/product/${slug}`,
   });
 }

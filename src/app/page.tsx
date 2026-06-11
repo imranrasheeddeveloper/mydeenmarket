@@ -4,78 +4,111 @@ import ProductCard from "@/components/ProductCard";
 import AnimateOnScroll from "@/components/AnimateOnScroll";
 import StatsCounter from "@/components/StatsCounter";
 import { getProducts, getCategories, getCollections } from "@/lib/data";
-import { generateBreadcrumbSchema } from "@/lib/seo";
+import { generateBreadcrumbSchema, generateFAQSchema, generateItemListSchema } from "@/lib/seo";
 import {
-  Truck,
-  Zap,
-  ShieldCheck,
-  Lock,
-  BookOpen,
-  Star,
-  ArrowRight,
-  Sparkles,
-  Heart,
-  Gift,
-  Users,
-  BookMarked,
-  Scroll,
-  Moon,
-  ChevronRight,
-  Mail,
-  TrendingUp,
-  Award,
-  Package,
+  Truck, Zap, ShieldCheck, Lock, BookOpen, Star, ArrowRight,
+  Heart, Gift, Users, BookMarked, Scroll, Moon, ChevronRight, Mail,
+  BookText, HandHeart, Sparkles, Scale, Baby, Feather, Gem, Landmark, Megaphone, Compass, Leaf,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 export default async function HomePage() {
   const [products, categories, collections] = await Promise.all([
-    getProducts(),
-    getCategories(),
-    getCollections(),
+    getProducts(), getCategories(), getCollections(),
   ]);
   const newArrivals = products.filter((p) => p.badge === "new");
   const mainCategories = categories.slice(0, 8);
   const mainCollections = collections.slice(0, 6);
+  const breadcrumbSchema = generateBreadcrumbSchema([{ name: "Home", url: "/" }]);
 
-  const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "Home", url: "/" },
+  const bestSellers = products.filter((p) => p.badge === "bestseller");
+  const itemListSchema = generateItemListSchema(products.slice(0, 10));
+  const faqSchema = generateFAQSchema([
+    {
+      question: "What Islamic products does MyDeenMarket sell?",
+      answer: "MyDeenMarket sells authentic Islamic books (Quran, Hadith, Seerah, Fiqh, Tafseer), Abaya, Tasbih, Janamaz (prayer mats), Zamzam water, Talbina, Ihram, Attar & Islamic fragrances, Oud soap, Miswak, Ajwa dates, and many more Islamic essentials.",
+    },
+    {
+      question: "Do you offer free shipping in Pakistan?",
+      answer: "Yes! We offer free shipping on all orders above Rs. 5,000 across Pakistan. Orders are dispatched same-day from Lahore.",
+    },
+    {
+      question: "Can I pay cash on delivery?",
+      answer: "Yes, we accept Cash on Delivery (COD) across Pakistan. We also accept credit/debit cards, bank transfers, JazzCash, and EasyPaisa.",
+    },
+    {
+      question: "Are your Islamic books authentic?",
+      answer: "100% authentic. We source directly from official publishers and verified distributors. All our Quran copies, Hadith collections, and Islamic literature are original publications.",
+    },
+    {
+      question: "Do you ship internationally?",
+      answer: "Currently we deliver across Pakistan. International shipping will be available soon. Contact us at info@mydeenmarket.com for special international orders.",
+    },
+    {
+      question: "Where is MyDeenMarket located?",
+      answer: "Our physical store is at Shop #50, Ground Floor, Big City Plaza, Gullberg III, Lahore, Pakistan. Open Monday–Saturday, 10 AM–8 PM.",
+    },
   ]);
-
-  const categoryIcons = [BookOpen, BookMarked, Scroll, Moon, Heart, Gift, Users, Star];
+  const categoryIconMap: Record<string, LucideIcon> = {
+    quran: BookOpen,
+    hadith: BookText,
+    prayer: HandHeart,
+    seerah: Sparkles,
+    fiqh: Scale,
+    children: Baby,
+    biography: Feather,
+    "islamic-products": Gem,
+    aqeedah: Heart,
+    history: Landmark,
+    dawah: Megaphone,
+    "hajj-umrah": Compass,
+    health: Leaf,
+  };
 
   const trustBadges = [
-    { icon: Truck, title: "Standard Delivery", desc: "3–5 working days" },
-    { icon: Zap, title: "Fast Dispatch", desc: "Shipped from Lahore" },
-    { icon: ShieldCheck, title: "Authentic Titles", desc: "Official publications" },
-    { icon: Lock, title: "Secure Checkout", desc: "SSL encrypted payments" },
+    { icon: Truck, title: "Free Delivery", desc: "On orders over Rs. 3,000" },
+    { icon: Zap, title: "Fast Dispatch", desc: "Same-day from Lahore" },
+    { icon: ShieldCheck, title: "100% Authentic", desc: "Official publications" },
+    { icon: Lock, title: "Secure Checkout", desc: "SSL encrypted" },
   ];
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
 
-      {/* Hero */}
       <HeroSlider />
 
-      {/* ─── Trust Badges ─── */}
-      <section className="py-10 bg-gradient-to-b from-[#FEFCF6] to-white border-y border-[#C5A44E]/10 relative" aria-label="Why shop with us">
-        <div className="absolute inset-0 islamic-pattern opacity-15" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+      {/* Visually hidden H1 for SEO — hero slides use H2 */}
+      <h1 className="sr-only">MyDeenMarket — Islamic Books & Products Online in Pakistan</h1>
+
+      {/* BLUF Summary — LLM/AI scraper readable block */}
+      <section className="sr-only" aria-label="Store summary">
+        <p>
+          MyDeenMarket is Pakistan&apos;s trusted online Islamic store based in Lahore. We sell authentic Islamic books
+          (Quran, Hadith, Seerah, Fiqh, Tafseer), Abaya, Tasbih, Janamaz prayer mats, Zamzam water, Talbina,
+          Ihram for Hajj &amp; Umrah, Islamic fragrances (Attar, Oud), Miswak, and Ajwa dates.
+          Free shipping on orders over Rs. 5,000. Cash on delivery available across Pakistan.
+          Visit us at Shop #50, Big City Plaza, Gullberg III, Lahore or call +92 303 5036392.
+        </p>
+      </section>
+
+      {/* Trust Strip */}
+      <section className="py-8 bg-white border-b border-slate-100" aria-label="Why shop with us">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10">
             {trustBadges.map((badge, i) => {
               const Icon = badge.icon;
               return (
-                <AnimateOnScroll key={i} delay={i * 100} animation="fade-up">
-                  <div className="flex items-center gap-3.5 group p-4 rounded-2xl bg-white/60 backdrop-blur-sm border border-[#C5A44E]/10 hover:border-[#C5A44E]/25 hover:bg-white/90 transition-all duration-300 hover:shadow-lg hover:shadow-[#C5A44E]/5">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-[#0D503C] to-[#14785A] flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 group-hover:shadow-xl transition-all duration-300">
-                      <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#E8D5A3]" />
+                <AnimateOnScroll key={i} delay={i * 80} animation="fade-up">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-11 h-11 rounded-xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
+                      <Icon className="w-5 h-5 text-[#0f172a]" />
                     </div>
                     <div>
-                      <strong className="text-xs sm:text-sm font-bold text-gray-900 block">{badge.title}</strong>
-                      <span className="text-xs text-gray-500">{badge.desc}</span>
+                      <strong className="text-sm font-semibold text-slate-900 block leading-tight">{badge.title}</strong>
+                      <span className="text-xs text-slate-400">{badge.desc}</span>
                     </div>
                   </div>
                 </AnimateOnScroll>
@@ -85,89 +118,94 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─── Shop by Category ─── */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-white to-[#FEFCF6] relative" aria-labelledby="categories-heading">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Categories */}
+      <section className="py-20 md:py-28 gradient-dark-warm relative overflow-hidden" aria-labelledby="categories-heading">
+        {/* Noor effects */}
+        <div className="noor-glow w-[500px] h-[500px] top-[-100px] right-[-100px]" />
+        <div className="noor-bubble w-[300px] h-[300px] bottom-[10%] left-[-50px]" />
+        <div className="noor-bubble-teal w-[250px] h-[250px] top-[20%] right-[10%]" />
+        <div className="noor-sparkle top-[15%] left-[20%]" style={{ animationDelay: '0s' }} />
+        <div className="noor-sparkle top-[60%] right-[15%]" style={{ animationDelay: '1.5s' }} />
+        <div className="noor-sparkle bottom-[25%] left-[40%]" style={{ animationDelay: '3s' }} />
+        <div className="noor-ring w-[400px] h-[400px] top-[-100px] left-[-100px]" />
+        <div className="noor-ring w-[300px] h-[300px] bottom-[-80px] right-[-60px]" style={{ animationDirection: 'reverse', animationDuration: '45s' }} />
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a853' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
+        
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 relative z-10">
           <AnimateOnScroll animation="fade-up">
-            <div className="flex items-center justify-between mb-12">
-              <div>
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold tracking-[0.3em] text-[#C5A44E] uppercase mb-3">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Explore
-                </span>
-                <h2 id="categories-heading" className="text-2xl sm:text-4xl font-bold text-gray-900">
-                  Shop by Category
-                </h2>
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#d4a853]/10 border border-[#d4a853]/20 mb-5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#d4a853] animate-pulse" />
+                <span className="text-xs font-semibold tracking-[0.2em] text-[#d4a853] uppercase">Explore Our Collection</span>
               </div>
-              <Link href="/collections" className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-[#0D503C] hover:text-[#C5A44E] transition-colors group">
-                View All
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
+              <h2 id="categories-heading" className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white font-[family-name:var(--font-playfair)] mb-3">
+                Shop by Category
+              </h2>
+              <p className="text-slate-400 text-sm max-w-md mx-auto">Discover our curated Islamic library spanning every area of knowledge</p>
             </div>
           </AnimateOnScroll>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
             {mainCategories.map((cat, i) => {
-              const Icon = categoryIcons[i % categoryIcons.length];
+              const Icon = categoryIconMap[cat.slug] || BookMarked;
               return (
-                <AnimateOnScroll key={cat.slug} delay={i * 80} animation="scale">
-                  <Link
-                    href={`/collections/${cat.slug}`}
-                    className="group relative bg-white rounded-2xl border border-gray-100/80 p-5 sm:p-6 transition-all duration-500 text-center overflow-hidden card-hover-lift"
-                  >
-                    {/* Hover glow */}
-                    <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-[#C5A44E]/5 to-[#0D503C]/5" />
-                    <div className="absolute inset-0 islamic-pattern opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    <div className="relative z-10">
-                      <div className={`w-14 h-14 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center mb-4 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg group-hover:shadow-xl`}>
-                        <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                <AnimateOnScroll key={cat.slug} delay={i * 60} animation="fade-up">
+                  <Link href={`/collections/${cat.slug}`} className="group relative overflow-hidden rounded-2xl bg-white/[0.04] backdrop-blur-sm border border-white/[0.06] hover:bg-white/[0.08] hover:border-[#d4a853]/30 transition-all duration-500 block">
+                    {/* Glow effect on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#d4a853]/0 via-transparent to-[#d4a853]/0 group-hover:from-[#d4a853]/5 group-hover:to-transparent transition-all duration-700" />
+                    
+                    <div className="relative p-5 sm:p-7 flex flex-col items-center text-center">
+                      {/* Icon container */}
+                      <div className="relative mb-5">
+                        <div className="absolute inset-0 bg-[#d4a853]/20 rounded-2xl blur-xl scale-0 group-hover:scale-100 transition-transform duration-500" />
+                        <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-[#d4a853]/20 to-[#d4a853]/5 border border-[#d4a853]/10 flex items-center justify-center group-hover:border-[#d4a853]/30 group-hover:from-[#d4a853]/30 group-hover:to-[#d4a853]/10 transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3">
+                          <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[#d4a853] transition-transform duration-500 group-hover:scale-110" strokeWidth={1.5} />
+                        </div>
                       </div>
-                      <h3 className="font-semibold text-gray-900 text-sm sm:text-base mb-1">{cat.name}</h3>
-                      <span className="text-xs text-[#C5A44E] font-medium">{cat.count}+ Books</span>
+                      
+                      {/* Text */}
+                      <h3 className="font-semibold text-white text-sm mb-1.5 group-hover:text-[#d4a853] transition-colors duration-300">{cat.name}</h3>
+                      <span className="text-[11px] text-slate-500 group-hover:text-slate-400 transition-colors font-medium tracking-wide">{cat.count}+ titles</span>
+                      
+                      {/* Arrow indicator */}
+                      <div className="mt-4 flex items-center gap-1 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                        <span className="text-[10px] text-[#d4a853] font-semibold uppercase tracking-wider">Browse</span>
+                        <ArrowRight className="w-3 h-3 text-[#d4a853]" />
+                      </div>
                     </div>
                   </Link>
                 </AnimateOnScroll>
               );
             })}
           </div>
+          <AnimateOnScroll animation="fade-up" delay={400}>
+            <div className="text-center mt-14">
+              <Link href="/collections" className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#d4a853] text-[#0f172a] text-sm font-bold hover:bg-[#e8c97a] transition-all duration-300 group shadow-lg shadow-[#d4a853]/20 hover:shadow-[#d4a853]/40">
+                View All Categories
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </AnimateOnScroll>
         </div>
       </section>
 
-      {/* ─── Best Sellers ─── */}
-      <section className="py-16 md:py-24 relative overflow-hidden" aria-labelledby="bestsellers-heading">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0A3D2E] via-[#0D503C] to-[#0A3D2E]" />
-        <div className="absolute inset-0 islamic-pattern-dark" />
-        {/* Decorative elements */}
-        <div className="absolute top-10 right-10 w-48 h-48 rounded-full border border-[#C5A44E]/10 animate-rotate-slow" />
-        <div className="absolute bottom-10 left-10 w-36 h-36 rounded-full border border-[#C5A44E]/8" />
-        <div className="absolute top-1/2 right-0 w-64 h-64 bg-[#C5A44E]/5 rounded-full blur-3xl" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      {/* Best Sellers */}
+      <section className="py-20 md:py-28 bg-[#f8f7f4]" aria-labelledby="bestsellers-heading">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <AnimateOnScroll animation="fade-up">
-            <div className="flex items-center justify-between mb-12">
+            <div className="flex items-end justify-between mb-12">
               <div>
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold tracking-[0.3em] text-[#C5A44E] uppercase mb-3">
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  Most Popular
-                </span>
-                <h2 id="bestsellers-heading" className="text-2xl sm:text-4xl font-bold text-white">
-                  Best Sellers
-                </h2>
+                <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Most Popular</p>
+                <h2 id="bestsellers-heading" className="text-3xl sm:text-4xl font-bold text-slate-900 font-[family-name:var(--font-playfair)]">Best Sellers</h2>
               </div>
-              <div className="flex items-center gap-4">
-                <span className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#C5A44E]/15 border border-[#C5A44E]/25 text-[#E8D5A3] text-sm font-semibold animate-glow-pulse">
-                  <Award className="w-4 h-4" />
-                  8 Best Sellers
-                </span>
-                <Link href="/collections?filter=bestseller" className="flex items-center gap-1.5 text-sm font-semibold text-[#C5A44E] hover:text-[#E8D5A3] transition-colors group">
-                  View All
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
+              <Link href="/collections?filter=bestseller" className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white hover:border-slate-300 transition-all group">
+                View All Best Sellers <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
             </div>
           </AnimateOnScroll>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {products.slice(0, 8).map((product, i) => (
-              <AnimateOnScroll key={product.id} delay={i * 80} animation="fade-up">
+              <AnimateOnScroll key={product.id} delay={i * 50} animation="fade-up">
                 <ProductCard product={product} />
               </AnimateOnScroll>
             ))}
@@ -175,178 +213,149 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─── Quranic Verse Banner ─── */}
-      <section className="py-20 md:py-28 bg-[#FEFCF6] relative overflow-hidden" aria-label="Quranic inspiration">
-        <div className="absolute inset-0 islamic-stars opacity-30 bg-parallax" />
-        {/* Decorative arches */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] rounded-b-full border border-[#C5A44E]/6 pointer-events-none" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[550px] h-[275px] rounded-b-full border border-[#C5A44E]/4 pointer-events-none" />
-
-        <AnimateOnScroll animation="scale">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            {/* Ornament top */}
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <div className="w-20 h-px bg-gradient-to-r from-transparent to-[#C5A44E]/60" />
-              <div className="w-2.5 h-2.5 rotate-45 border border-[#C5A44E]/40" />
-              <Star className="w-4 h-4 text-[#C5A44E]/50 fill-[#C5A44E]/20" />
-              <div className="w-2.5 h-2.5 rotate-45 border border-[#C5A44E]/40" />
-              <div className="w-20 h-px bg-gradient-to-l from-transparent to-[#C5A44E]/60" />
+      {/* Quranic Verse */}
+      <section className="py-24 md:py-32 gradient-dark-rich relative overflow-hidden" aria-label="Quranic inspiration">
+        <div className="absolute inset-0 islamic-pattern opacity-[0.03]" />
+        {/* Noor effects — divine light radiating from center */}
+        <div className="noor-glow w-[700px] h-[700px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ animationDuration: '10s' }} />
+        <div className="noor-bubble w-[200px] h-[200px] top-[5%] right-[15%]" style={{ animationDelay: '2s' }} />
+        <div className="noor-bubble w-[150px] h-[150px] bottom-[10%] left-[10%]" style={{ animationDelay: '4s' }} />
+        <div className="noor-bubble-teal w-[180px] h-[180px] top-[30%] left-[5%]" style={{ animationDelay: '1s' }} />
+        <div className="noor-sparkle top-[20%] left-[30%]" style={{ animationDelay: '0.5s' }} />
+        <div className="noor-sparkle top-[40%] right-[25%]" style={{ animationDelay: '2s' }} />
+        <div className="noor-sparkle bottom-[30%] left-[55%]" style={{ animationDelay: '3.5s' }} />
+        <div className="noor-sparkle top-[15%] right-[40%]" style={{ animationDelay: '1s' }} />
+        <div className="noor-ring w-[500px] h-[500px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ animationDuration: '40s' }} />
+        <div className="noor-ring w-[350px] h-[350px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ animationDuration: '25s', animationDirection: 'reverse' }} />
+        <AnimateOnScroll animation="fade-up">
+          <div className="max-w-3xl mx-auto px-6 sm:px-8 text-center relative z-10">
+            <div className="flex items-center justify-center gap-4 mb-10">
+              <div className="w-20 h-px bg-gradient-to-r from-transparent to-[#d4a853]/20" />
+              <div className="w-2 h-2 rotate-45 border border-[#d4a853]/20" />
+              <Star className="w-4 h-4 text-[#d4a853]/20" />
+              <div className="w-2 h-2 rotate-45 border border-[#d4a853]/20" />
+              <div className="w-20 h-px bg-gradient-to-l from-transparent to-[#d4a853]/20" />
             </div>
-
-            <p className="text-3xl md:text-4xl text-[#C5A44E] mb-5 font-serif leading-relaxed" dir="rtl">
+            <p className="text-4xl md:text-6xl text-[#d4a853]/80 mb-6 font-[family-name:var(--font-playfair)] leading-relaxed" dir="rtl">
               اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ
             </p>
-            <p className="text-lg md:text-xl text-gray-700 italic mb-3 font-light">
+            <p className="text-xl md:text-2xl text-slate-300 italic mb-3 font-light">
               &ldquo;Read in the name of your Lord who created&rdquo;
             </p>
-            <p className="text-sm text-[#C5A44E] font-semibold tracking-wide">— Surah Al-Alaq (96:1)</p>
-
-            {/* Ornament bottom */}
-            <div className="flex items-center justify-center gap-4 mt-8">
-              <div className="w-20 h-px bg-gradient-to-r from-transparent to-[#C5A44E]/60" />
-              <div className="w-2.5 h-2.5 rotate-45 border border-[#C5A44E]/40" />
-              <Star className="w-4 h-4 text-[#C5A44E]/50 fill-[#C5A44E]/20" />
-              <div className="w-2.5 h-2.5 rotate-45 border border-[#C5A44E]/40" />
-              <div className="w-20 h-px bg-gradient-to-l from-transparent to-[#C5A44E]/60" />
+            <p className="text-sm text-[#d4a853]/50 font-medium tracking-wider">— Surah Al-Alaq (96:1)</p>
+            <div className="flex items-center justify-center gap-4 mt-10">
+              <div className="w-20 h-px bg-gradient-to-r from-transparent to-[#d4a853]/20" />
+              <div className="w-2 h-2 rotate-45 border border-[#d4a853]/20" />
+              <Star className="w-4 h-4 text-[#d4a853]/20" />
+              <div className="w-2 h-2 rotate-45 border border-[#d4a853]/20" />
+              <div className="w-20 h-px bg-gradient-to-l from-transparent to-[#d4a853]/20" />
             </div>
           </div>
         </AnimateOnScroll>
       </section>
 
-      {/* ─── Stats Counter ─── */}
-      <section className="py-16 md:py-24 relative overflow-hidden" aria-label="Our impact">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0A3D2E] via-[#0D503C] to-[#0A3D2E]" />
-        <div className="absolute inset-0 islamic-pattern-dark" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-[#C5A44E]/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#14785A]/10 rounded-full blur-3xl" />
+      {/* Promo Banners */}
+      <section className="py-20 md:py-28 bg-white" aria-label="Featured collections">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+            <AnimateOnScroll animation="fade-up">
+              <Link href="/collections/hajj-umrah" className="group relative overflow-hidden rounded-3xl h-80 md:h-96 block">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0d9488]/30 group-hover:scale-[1.03] transition-transform duration-700" />
+                <div className="absolute inset-0 islamic-pattern opacity-[0.04]" />
+                <div className="absolute top-0 right-0 w-60 h-60 bg-[#0d9488]/10 rounded-full blur-[80px]" />
+                <div className="relative h-full flex flex-col justify-end p-8 md:p-12">
+                  <span className="text-[#d4a853] text-[11px] font-semibold tracking-[0.25em] uppercase mb-3">Sacred Journey</span>
+                  <h3 className="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight font-[family-name:var(--font-playfair)]">Hajj &amp; Umrah<br/>Collection</h3>
+                  <p className="text-slate-400 text-sm mb-6 max-w-xs">Essential books, guides &amp; resources for your sacred journey.</p>
+                  <span className="inline-flex items-center gap-2 text-[#d4a853] font-semibold text-sm group-hover:gap-3 transition-all w-fit">
+                    Shop Hajj & Umrah Books <ArrowRight className="w-4 h-4" />
+                  </span>
+                </div>
+              </Link>
+            </AnimateOnScroll>
+            <AnimateOnScroll animation="fade-up" delay={100}>
+              <Link href="/collections/children" className="group relative overflow-hidden rounded-3xl h-80 md:h-96 block">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#1a0e2e] via-[#2d1b69] to-[#d4a853]/10 group-hover:scale-[1.03] transition-transform duration-700" />
+                <div className="absolute inset-0 islamic-pattern opacity-[0.04]" />
+                <div className="absolute bottom-0 left-0 w-60 h-60 bg-[#d4a853]/10 rounded-full blur-[80px]" />
+                <div className="relative h-full flex flex-col justify-end p-8 md:p-12">
+                  <span className="text-[#e8c97a] text-[11px] font-semibold tracking-[0.25em] uppercase mb-3">Young Readers</span>
+                  <h3 className="text-3xl md:text-4xl font-bold text-white mb-3 leading-tight font-[family-name:var(--font-playfair)]">Children&apos;s<br/>Corner</h3>
+                  <p className="text-slate-400 text-sm mb-6 max-w-xs">Beautiful Islamic stories and educational content for young readers.</p>
+                  <span className="inline-flex items-center gap-2 text-[#e8c97a] font-semibold text-sm group-hover:gap-3 transition-all w-fit">
+                    Explore Kids Islamic Books <ArrowRight className="w-4 h-4" />
+                  </span>
+                </div>
+              </Link>
+            </AnimateOnScroll>
+          </div>
+        </div>
+      </section>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      {/* New Arrivals */}
+      <section className="py-20 md:py-28 bg-[#f8f7f4]" aria-labelledby="new-arrivals-heading">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <AnimateOnScroll animation="fade-up">
-            <div className="text-center mb-12">
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold tracking-[0.3em] text-[#C5A44E] uppercase mb-3">
-                <Package className="w-3.5 h-3.5" />
-                Our Impact
-              </span>
-              <h2 className="text-2xl sm:text-4xl font-bold text-white">
-                Trusted by Thousands
-              </h2>
+            <div className="flex items-end justify-between mb-12">
+              <div>
+                <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Just Arrived</p>
+                <h2 id="new-arrivals-heading" className="text-3xl sm:text-4xl font-bold text-slate-900 font-[family-name:var(--font-playfair)]">New Arrivals</h2>
+              </div>
+              <Link href="/collections?filter=new" className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white hover:border-slate-300 transition-all group">
+                View New Arrivals <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+          </AnimateOnScroll>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {newArrivals.map((product, i) => (
+              <AnimateOnScroll key={product.id} delay={i * 50} animation="fade-up">
+                <ProductCard product={product} />
+              </AnimateOnScroll>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="py-20 md:py-28 gradient-dark-teal relative overflow-hidden" aria-label="Our impact">
+        <div className="absolute inset-0 islamic-pattern opacity-[0.03]" />
+        {/* Noor effects */}
+        <div className="noor-glow w-[400px] h-[400px] top-[-50px] right-[-50px]" style={{ animationDelay: '1s' }} />
+        <div className="noor-bubble w-[250px] h-[250px] bottom-[-30px] left-[20%]" style={{ animationDelay: '3s' }} />
+        <div className="noor-bubble-teal w-[200px] h-[200px] top-[30%] left-[-30px]" />
+        <div className="noor-sparkle top-[20%] right-[30%]" style={{ animationDelay: '1s' }} />
+        <div className="noor-sparkle bottom-[30%] left-[60%]" style={{ animationDelay: '2.5s' }} />
+        <div className="noor-ring w-[350px] h-[350px] top-[-80px] right-[-80px]" style={{ animationDuration: '35s' }} />
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 relative z-10">
+          <AnimateOnScroll animation="fade-up">
+            <div className="text-center mb-14">
+              <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Our Impact</p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white font-[family-name:var(--font-playfair)]">Trusted by Thousands</h2>
             </div>
           </AnimateOnScroll>
           <StatsCounter />
         </div>
       </section>
 
-      {/* ─── Promotional Banners ─── */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-[#FEFCF6] to-white" aria-label="Featured collections">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <AnimateOnScroll animation="fade-left">
-              <Link href="/collections/hajj-umrah" className="group relative overflow-hidden rounded-2xl h-64 md:h-72 block">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0A3D2E] to-[#14785A] group-hover:scale-105 transition-transform duration-700" />
-                <div className="absolute inset-0 islamic-pattern opacity-20" />
-                <div className="absolute top-0 right-0 w-40 h-40 bg-[#C5A44E]/10 rounded-full blur-3xl group-hover:bg-[#C5A44E]/20 transition-colors duration-700" />
-                <div className="relative h-full flex flex-col justify-center p-8 md:p-10">
-                  <span className="text-[#C5A44E] text-xs font-bold tracking-[0.2em] uppercase mb-2">Sacred Journey</span>
-                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">Hajj &amp; Umrah Collection</h3>
-                  <p className="text-white/70 text-sm md:text-base mb-5 max-w-sm">
-                    Everything you need for your sacred journey — books, guides, Ahraam &amp; essentials
-                  </p>
-                  <span className="inline-flex items-center gap-2 text-[#E8D5A3] font-semibold text-sm border border-[#C5A44E]/30 rounded-full px-5 py-2.5 w-fit group-hover:bg-[#C5A44E] group-hover:text-[#0A3D2E] transition-all duration-300">
-                    Shop Now
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </div>
-              </Link>
-            </AnimateOnScroll>
-            <AnimateOnScroll animation="fade-right">
-              <Link href="/collections/children" className="group relative overflow-hidden rounded-2xl h-64 md:h-72 block">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#2d1b69] to-[#5B3E96] group-hover:scale-105 transition-transform duration-700" />
-                <div className="absolute inset-0 islamic-stars opacity-20" />
-                <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#E8D5A3]/10 rounded-full blur-3xl group-hover:bg-[#E8D5A3]/20 transition-colors duration-700" />
-                <div className="relative h-full flex flex-col justify-center p-8 md:p-10">
-                  <span className="text-[#E8D5A3] text-xs font-bold tracking-[0.2em] uppercase mb-2">Young Readers</span>
-                  <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">Children&apos;s Corner</h3>
-                  <p className="text-white/70 text-sm md:text-base mb-5 max-w-sm">
-                    Beautiful Islamic stories, activity books, and educational content for young readers
-                  </p>
-                  <span className="inline-flex items-center gap-2 text-[#E8D5A3] font-semibold text-sm border border-[#C5A44E]/30 rounded-full px-5 py-2.5 w-fit group-hover:bg-[#C5A44E] group-hover:text-[#0A3D2E] transition-all duration-300">
-                    Explore
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </div>
-              </Link>
-            </AnimateOnScroll>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── New Arrivals ─── */}
-      <section className="py-16 md:py-24" aria-labelledby="new-arrivals-heading">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Collections */}
+      <section className="py-20 md:py-28 bg-white" aria-labelledby="collections-heading">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <AnimateOnScroll animation="fade-up">
-            <div className="flex items-center justify-between mb-12">
-              <div>
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold tracking-[0.3em] text-[#C5A44E] uppercase mb-3">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Just Arrived
-                </span>
-                <h2 id="new-arrivals-heading" className="text-2xl sm:text-4xl font-bold text-gray-900">
-                  New Arrivals
-                </h2>
-              </div>
-              <Link href="/collections?filter=new" className="flex items-center gap-1.5 text-sm font-semibold text-[#0D503C] hover:text-[#C5A44E] transition-colors group">
-                View All
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
+            <div className="text-center mb-14">
+              <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Curated</p>
+              <h2 id="collections-heading" className="text-3xl sm:text-4xl font-bold text-slate-900 font-[family-name:var(--font-playfair)]">Browse Collections</h2>
             </div>
           </AnimateOnScroll>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-            {newArrivals.map((product, i) => (
-              <AnimateOnScroll key={product.id} delay={i * 80} animation="fade-up">
-                <ProductCard product={product} />
-              </AnimateOnScroll>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Browse Collections ─── */}
-      <section className="py-16 md:py-24 bg-[#FEFCF6] relative" aria-labelledby="collections-heading">
-        <div className="absolute inset-0 islamic-pattern opacity-10" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <AnimateOnScroll animation="fade-up">
-            <div className="flex items-center justify-between mb-12">
-              <div>
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold tracking-[0.3em] text-[#C5A44E] uppercase mb-3">
-                  <BookOpen className="w-3.5 h-3.5" />
-                  Curated
-                </span>
-                <h2 id="collections-heading" className="text-2xl sm:text-4xl font-bold text-gray-900">
-                  Browse Collections
-                </h2>
-              </div>
-              <Link href="/collections" className="flex items-center gap-1.5 text-sm font-semibold text-[#0D503C] hover:text-[#C5A44E] transition-colors group">
-                View All
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-          </AnimateOnScroll>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
             {mainCollections.map((col, i) => (
-              <AnimateOnScroll key={col.slug} delay={i * 100} animation="scale">
-                <Link
-                  href={`/collections/${col.slug}`}
-                  className="group relative overflow-hidden rounded-2xl h-44 md:h-52 block"
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${col.gradient} group-hover:scale-110 transition-transform duration-700`} />
-                  <div className="absolute inset-0 islamic-pattern-dark opacity-30" />
-                  {/* Hover glow */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
-                  <div className="relative h-full flex flex-col justify-end p-5 md:p-7">
-                    <h3 className="text-lg md:text-xl font-bold text-white mb-1.5">{col.name}</h3>
-                    <span className="inline-flex items-center gap-1 text-sm text-[#E8D5A3] group-hover:text-[#C5A44E] transition-colors font-medium">
-                      Shop Now
-                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <AnimateOnScroll key={col.slug} delay={i * 60} animation="fade-up">
+                <Link href={`/collections/${col.slug}`} className="group relative overflow-hidden rounded-2xl h-48 md:h-56 block">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${col.gradient} group-hover:scale-105 transition-transform duration-700`} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                  <div className="relative h-full flex flex-col justify-end p-6 md:p-8">
+                    <h3 className="text-xl md:text-2xl font-bold text-white mb-1.5 font-[family-name:var(--font-playfair)]">{col.name}</h3>
+                    <span className="inline-flex items-center gap-1 text-sm text-white/60 group-hover:text-white transition-colors font-medium">
+                      Browse {col.name} <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                     </span>
                   </div>
                 </Link>
@@ -356,44 +365,28 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─── Newsletter ─── */}
-      <section className="py-20 md:py-28 relative overflow-hidden" aria-labelledby="newsletter-heading">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0A3D2E] via-[#0D503C] to-[#0A3D2E]" />
-        <div className="absolute inset-0 islamic-stars opacity-30" />
-        {/* Decorative arches */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-b-full border border-[#C5A44E]/8 pointer-events-none" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[250px] rounded-b-full border border-[#C5A44E]/5 pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#C5A44E]/5 rounded-full blur-3xl" />
-
+      {/* Newsletter */}
+      <section className="py-24 md:py-32 gradient-dark-warm relative overflow-hidden" aria-labelledby="newsletter-heading">
+        <div className="absolute inset-0 islamic-pattern opacity-[0.03]" />
+        {/* Noor effects */}
+        <div className="noor-glow w-[500px] h-[500px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{ animationDuration: '12s' }} />
+        <div className="noor-bubble w-[200px] h-[200px] top-[10%] left-[15%]" style={{ animationDelay: '2s' }} />
+        <div className="noor-bubble-teal w-[180px] h-[180px] bottom-[15%] right-[10%]" style={{ animationDelay: '5s' }} />
+        <div className="noor-sparkle top-[25%] right-[20%]" style={{ animationDelay: '0.5s' }} />
+        <div className="noor-sparkle bottom-[20%] left-[30%]" style={{ animationDelay: '2s' }} />
+        <div className="noor-sparkle top-[50%] left-[15%]" style={{ animationDelay: '3.5s' }} />
+        <div className="noor-ring w-[400px] h-[400px] bottom-[-100px] left-[-100px]" style={{ animationDuration: '50s' }} />
         <AnimateOnScroll animation="fade-up">
-          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            {/* Glassmorphic card */}
-            <div className="p-8 md:p-12 rounded-3xl bg-white/5 backdrop-blur-md border border-[#C5A44E]/15">
-              <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-[#C5A44E]/20 flex items-center justify-center border border-[#C5A44E]/20 animate-float">
-                <Mail className="w-8 h-8 text-[#E8D5A3]" />
-              </div>
-              <h2 id="newsletter-heading" className="text-2xl sm:text-3xl font-bold text-white mb-3">
-                Stay Updated
-              </h2>
-              <p className="text-[#E8D5A3]/80 mb-8 max-w-md mx-auto">
-                Subscribe to our newsletter for new arrivals, exclusive offers, and Islamic content
-              </p>
-              <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                <input
-                  type="email"
-                  placeholder="Enter your email address"
-                  className="flex-1 px-5 py-3.5 rounded-full text-sm bg-white/10 border border-[#C5A44E]/20 text-white placeholder-white/50 focus:outline-none focus:border-[#C5A44E]/50 focus:bg-white/15 transition-all"
-                  aria-label="Email address for newsletter"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="px-8 py-3.5 bg-gradient-to-r from-[#C5A44E] to-[#A08839] text-[#0A3D2E] rounded-full font-bold text-sm hover:from-[#D4AF37] hover:to-[#C5A44E] transition-all shadow-[0_4px_20px_rgba(197,164,78,0.3)] hover:shadow-[0_8px_30px_rgba(197,164,78,0.4)] hover:scale-105"
-                >
-                  Subscribe
-                </button>
-              </form>
+          <div className="max-w-lg mx-auto px-6 sm:px-8 text-center relative z-10">
+            <div className="w-14 h-14 mx-auto mb-7 rounded-2xl bg-[#d4a853]/10 flex items-center justify-center border border-[#d4a853]/10">
+              <Mail className="w-6 h-6 text-[#d4a853]" />
             </div>
+            <h2 id="newsletter-heading" className="text-3xl sm:text-4xl font-bold text-white mb-4 font-[family-name:var(--font-playfair)]">Stay Updated</h2>
+            <p className="text-slate-400 mb-10 text-sm leading-relaxed">Get notified about new arrivals, exclusive offers, and Islamic content.</p>
+            <form className="flex flex-col sm:flex-row gap-3">
+              <input type="email" placeholder="Enter your email" className="flex-1 px-5 py-4 rounded-full text-sm bg-white/[0.06] border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-[#d4a853]/30 focus:bg-white/[0.08] transition-all" aria-label="Email address" required />
+              <button type="submit" className="px-8 py-4 bg-[#d4a853] text-[#0f172a] rounded-full font-semibold text-sm hover:bg-[#e8c97a] transition-all hover:shadow-[0_4px_20px_rgba(212,168,83,0.3)]">Subscribe</button>
+            </form>
           </div>
         </AnimateOnScroll>
       </section>

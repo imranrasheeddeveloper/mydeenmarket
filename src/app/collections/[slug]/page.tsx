@@ -16,9 +16,10 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       noIndex: true,
     });
   }
+  const descBase = category.description.substring(0, 100);
   return generatePageMetadata({
-    title: category.name,
-    description: category.description,
+    title: `${category.name} — Buy Online in Pakistan`,
+    description: `${descBase} Shop authentic ${category.name.toLowerCase()} at MyDeenMarket. Free shipping over Rs. 5,000.`,
     path: `/collections/${slug}`,
   });
 }

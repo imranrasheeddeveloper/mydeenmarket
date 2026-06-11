@@ -31,7 +31,7 @@ export default function AccountPage() {
           <div className="bg-white rounded-2xl border border-gray-100 p-6 text-center">
             <div className="w-20 h-20 mx-auto rounded-full bg-emerald-100 flex items-center justify-center mb-4">
               {session.user.image ? (
-                <img src={session.user.image} alt="" className="w-20 h-20 rounded-full object-cover" />
+                <img src={session.user.image} alt={`${session.user.name || "User"} profile picture`} className="w-20 h-20 rounded-full object-cover" width={80} height={80} />
               ) : (
                 <span className="text-3xl font-bold text-emerald-700">
                   {session.user.name?.[0]?.toUpperCase() || "U"}
@@ -66,9 +66,9 @@ export default function AccountPage() {
         <div className="md:col-span-2 space-y-6">
           {/* Recent Orders */}
           <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <h3 className="font-bold text-gray-900 mb-4">Recent Orders</h3>
+            <h2 className="font-bold text-gray-900 mb-4">Recent Orders</h2>
             <div className="text-center py-8">
-              <svg className="w-12 h-12 text-gray-200 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-12 h-12 text-gray-200 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
               <p className="text-gray-500 text-sm">No orders yet</p>
@@ -81,7 +81,7 @@ export default function AccountPage() {
           {/* Saved Addresses */}
           <div className="bg-white rounded-2xl border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-900">Saved Addresses</h3>
+              <h2 className="font-bold text-gray-900">Saved Addresses</h2>
               <button className="text-sm text-emerald-700 font-medium hover:underline">
                 + Add Address
               </button>
@@ -93,7 +93,7 @@ export default function AccountPage() {
 
           {/* Wishlist */}
           <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <h3 className="font-bold text-gray-900 mb-4">Wishlist</h3>
+            <h2 className="font-bold text-gray-900 mb-4">Wishlist</h2>
             <div className="text-center py-8">
               <p className="text-gray-500 text-sm">Your wishlist is empty</p>
               <Link href="/collections" className="inline-block mt-3 text-sm text-emerald-700 font-medium hover:underline">
