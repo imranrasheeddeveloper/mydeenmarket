@@ -1,13 +1,120 @@
 "use client";
 
-import { siteConfig } from "@/lib/data-types";
+import { useState, useEffect } from "react";
+
+interface Settings {
+  name: string;
+  title: string;
+  description: string;
+  url: string;
+  address: string;
+  email: string;
+  phone: string;
+  hours: string;
+  freeShippingThreshold: number;
+  socialFacebook: string;
+  socialInstagram: string;
+  socialYoutube: string;
+  smtpHost: string;
+  smtpPort: number;
+  smtpUser: string;
+  smtpPass: string;
+  smtpFrom: string;
+  smtpSecure: boolean;
+}
+
+const defaults: Settings = {
+  name: "", title: "", description: "", url: "", address: "", email: "", phone: "", hours: "",
+  freeShippingThreshold: 5000,
+  socialFacebook: "", socialInstagram: "", socialYoutube: "",
+  smtpHost: "", smtpPort: 587, smtpUser: "", smtpPass: "", smtpFrom: "", smtpSecure: false,
+};
 
 export default function AdminSettingsPage() {
+  const [form, setForm] = useState<Settings>(defaults);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [smtpMsg, setSmtpMsg] = useState("");
+
+  useEffect(() => {
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((d) => setForm((prev) => ({ ...prev, ...d })))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const update = (field: keyof Settings, value: string | number | boolean) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setMsg("");
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (res.ok) setMsg("Settings saved successfully!");
+      else setMsg("Failed to save settings.");
+    } catch {
+      setMsg("Error saving settings.");
+    } finally {
+      setSaving(false);
+      setTimeout(() => setMsg(""), 3000);
+    }
+  };
+
+  const handleTestSmtp = async () => {
+    setTesting(true);
+    setSmtpMsg("");
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          smtpHost: form.smtpHost,
+          smtpPort: form.smtpPort,
+          smtpUser: form.smtpUser,
+          smtpPass: form.smtpPass,
+          smtpSecure: form.smtpSecure,
+          smtpFrom: form.smtpFrom,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) setSmtpMsg("Test email sent to your admin email!");
+      else setSmtpMsg(data.error);
+    } catch {
+      setSmtpMsg("Connection error.");
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-20">
+        <div className="w-8 h-8 border-4 border-emerald-200 border-t-emerald-700 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const inputCls = "w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600";
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage your store configuration</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage your store configuration</p>
+        </div>
+        {msg && (
+          <span className={`text-sm font-medium ${msg.includes("success") ? "text-emerald-600" : "text-red-600"}`}>{msg}</span>
+        )}
       </div>
 
       {/* General Settings */}
@@ -21,31 +128,31 @@ export default function AdminSettingsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Store Name</label>
-            <input type="text" defaultValue={siteConfig.name} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" />
+            <input type="text" value={form.name} onChange={(e) => update("name", e.target.value)} className={inputCls} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Store URL</label>
-            <input type="url" defaultValue={siteConfig.url} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" />
+            <input type="url" value={form.url} onChange={(e) => update("url", e.target.value)} className={inputCls} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Contact Email</label>
-            <input type="email" defaultValue={siteConfig.email} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" />
+            <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className={inputCls} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone Number</label>
-            <input type="tel" defaultValue={siteConfig.phone} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" />
+            <input type="tel" value={form.phone} onChange={(e) => update("phone", e.target.value)} className={inputCls} />
           </div>
           <div className="sm:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Address</label>
-            <input type="text" defaultValue={siteConfig.address} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" />
+            <input type="text" value={form.address} onChange={(e) => update("address", e.target.value)} className={inputCls} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Business Hours</label>
-            <input type="text" defaultValue={siteConfig.hours} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" />
+            <input type="text" value={form.hours} onChange={(e) => update("hours", e.target.value)} className={inputCls} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Free Shipping Threshold (PKR)</label>
-            <input type="number" defaultValue={siteConfig.freeShippingThreshold} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" />
+            <input type="number" value={form.freeShippingThreshold} onChange={(e) => update("freeShippingThreshold", Number(e.target.value))} className={inputCls} />
           </div>
         </div>
       </div>
@@ -61,15 +168,15 @@ export default function AdminSettingsPage() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Facebook URL</label>
-            <input type="url" defaultValue={siteConfig.social.facebook} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" />
+            <input type="url" value={form.socialFacebook} onChange={(e) => update("socialFacebook", e.target.value)} className={inputCls} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Instagram URL</label>
-            <input type="url" defaultValue={siteConfig.social.instagram} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" />
+            <input type="url" value={form.socialInstagram} onChange={(e) => update("socialInstagram", e.target.value)} className={inputCls} />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">YouTube URL</label>
-            <input type="url" defaultValue={siteConfig.social.youtube} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" />
+            <input type="url" value={form.socialYoutube} onChange={(e) => update("socialYoutube", e.target.value)} className={inputCls} />
           </div>
         </div>
       </div>
@@ -85,87 +192,78 @@ export default function AdminSettingsPage() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Meta Title</label>
-            <input type="text" defaultValue={siteConfig.title} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" />
+            <input type="text" value={form.title} onChange={(e) => update("title", e.target.value)} className={inputCls} />
             <p className="text-xs text-gray-400 mt-1">Recommended: 50-60 characters</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">Meta Description</label>
-            <textarea rows={3} defaultValue={siteConfig.description} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600 resize-none" />
+            <textarea rows={3} value={form.description} onChange={(e) => update("description", e.target.value)} className={`${inputCls} resize-none`} />
             <p className="text-xs text-gray-400 mt-1">Recommended: 150-160 characters</p>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Google Verification Code</label>
-            <input type="text" placeholder="your-google-verification-code" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" />
-          </div>
         </div>
       </div>
 
-      {/* Authentication */}
+      {/* SMTP / Email Settings */}
       <div className="bg-white rounded-xl border border-gray-100 p-6">
         <h2 className="font-bold text-gray-900 mb-6 flex items-center gap-2">
           <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
           </svg>
-          Authentication (Google OAuth)
+          Email / SMTP Configuration
         </h2>
-        <div className="space-y-4">
+        <p className="text-sm text-gray-500 mb-5">Configure SMTP to send order confirmations and status update emails to customers.</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Google Client ID</label>
-            <input type="text" placeholder="Set via GOOGLE_CLIENT_ID env variable" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600 bg-gray-50" readOnly />
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">SMTP Host</label>
+            <input type="text" value={form.smtpHost} onChange={(e) => update("smtpHost", e.target.value)} placeholder="smtp.gmail.com" className={inputCls} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Google Client Secret</label>
-            <input type="password" placeholder="Set via GOOGLE_CLIENT_SECRET env variable" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600 bg-gray-50" readOnly />
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">SMTP Port</label>
+            <input type="number" value={form.smtpPort} onChange={(e) => update("smtpPort", Number(e.target.value))} className={inputCls} />
           </div>
-          <div className="p-3 bg-blue-50 rounded-lg text-xs text-blue-700">
-            <strong>Note:</strong> OAuth credentials must be set via environment variables for security.
-            Set <code className="bg-blue-100 px-1 rounded">GOOGLE_CLIENT_ID</code>, <code className="bg-blue-100 px-1 rounded">GOOGLE_CLIENT_SECRET</code>, and <code className="bg-blue-100 px-1 rounded">NEXTAUTH_SECRET</code> in your <code className="bg-blue-100 px-1 rounded">.env.local</code> file.
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">SMTP Username</label>
+            <input type="text" value={form.smtpUser} onChange={(e) => update("smtpUser", e.target.value)} placeholder="your@email.com" className={inputCls} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">SMTP Password / App Password</label>
+            <input type="password" value={form.smtpPass} onChange={(e) => update("smtpPass", e.target.value)} placeholder="••••••••" className={inputCls} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">From Email</label>
+            <input type="email" value={form.smtpFrom} onChange={(e) => update("smtpFrom", e.target.value)} placeholder="noreply@yourstore.com" className={inputCls} />
+            <p className="text-xs text-gray-400 mt-1">Defaults to SMTP username if empty</p>
+          </div>
+          <div className="flex items-end">
+            <label className="flex items-center gap-2.5 pb-2.5">
+              <input type="checkbox" checked={form.smtpSecure} onChange={(e) => update("smtpSecure", e.target.checked)} className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500" />
+              <span className="text-sm text-gray-700">Use SSL/TLS (port 465)</span>
+            </label>
           </div>
         </div>
-      </div>
-
-      {/* Currency */}
-      <div className="bg-white rounded-xl border border-gray-100 p-6">
-        <h2 className="font-bold text-gray-900 mb-6 flex items-center gap-2">
-          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Currency Settings
-        </h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Default Currency</label>
-            <select defaultValue="PKR" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600">
-              <option value="PKR">🇵🇰 Pakistani Rupee (PKR)</option>
-              <option value="USD">🇺🇸 US Dollar (USD)</option>
-              <option value="GBP">🇬🇧 British Pound (GBP)</option>
-              <option value="EUR">🇪🇺 Euro (EUR)</option>
-              <option value="SAR">🇸🇦 Saudi Riyal (SAR)</option>
-              <option value="AED">🇦🇪 UAE Dirham (AED)</option>
-            </select>
-          </div>
-          <div className="flex items-center gap-3">
-            <input type="checkbox" id="auto-detect" defaultChecked className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500" />
-            <label htmlFor="auto-detect" className="text-sm text-gray-700">
-              Auto-detect visitor currency based on timezone/location
-            </label>
-          </div>
-          <div className="flex items-center gap-3">
-            <input type="checkbox" id="show-selector" defaultChecked className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500" />
-            <label htmlFor="show-selector" className="text-sm text-gray-700">
-              Show currency selector in header
-            </label>
-          </div>
+        <div className="mt-5 flex items-center gap-3 flex-wrap">
+          <button
+            onClick={handleTestSmtp}
+            disabled={testing || !form.smtpHost || !form.smtpUser}
+            className="px-5 py-2.5 border border-emerald-200 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {testing ? "Sending..." : "Send Test Email"}
+          </button>
+          {smtpMsg && <span className={`text-sm ${smtpMsg.includes("sent") ? "text-emerald-600" : "text-red-600"}`}>{smtpMsg}</span>}
+        </div>
+        <div className="mt-4 p-3 bg-amber-50 rounded-lg text-xs text-amber-700">
+          <strong>Gmail tip:</strong> Use <code className="bg-amber-100 px-1 rounded">smtp.gmail.com</code>, port <code className="bg-amber-100 px-1 rounded">587</code>, and generate an <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener noreferrer" className="underline font-medium">App Password</a> (don&apos;t use your regular password).
         </div>
       </div>
 
       {/* Save */}
       <div className="flex items-center justify-end gap-3">
-        <button className="px-5 py-2.5 border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors">
-          Reset
-        </button>
-        <button className="px-8 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-sm font-medium transition-colors">
-          Save Changes
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="px-8 py-2.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white rounded-xl text-sm font-medium transition-colors"
+        >
+          {saving ? "Saving..." : "Save All Settings"}
         </button>
       </div>
     </div>

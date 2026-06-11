@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendOrderConfirmation } from "@/lib/email";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
@@ -26,6 +27,19 @@ export async function POST(req: NextRequest) {
 
     // Generate order number
     const orderNumber = `MDM-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
+    // --- Validate product IDs exist ---
+    const productIds = items
+      .map((item: { id?: string }) => item.id)
+      .filter((id: string | undefined): id is string => !!id);
+
+    const existingProducts = productIds.length > 0
+      ? await prisma.product.findMany({
+          where: { id: { in: productIds } },
+          select: { id: true },
+        })
+      : [];
+    const validProductIds = new Set(existingProducts.map((p) => p.id));
 
     // --- Auto-create User if not exists ---
     let user = await prisma.user.findUnique({ where: { email } });
@@ -74,7 +88,7 @@ export async function POST(req: NextRequest) {
             name: item.name,
             qty: item.qty,
             price: item.price,
-            productId: item.id || undefined,
+            productId: item.id && validProductIds.has(item.id) ? item.id : undefined,
           })),
         },
       },
@@ -91,6 +105,21 @@ export async function POST(req: NextRequest) {
         phone,
       },
     });
+
+    // --- Send order confirmation email (async, don't block response) ---
+    sendOrderConfirmation({
+      orderNumber: order.orderNumber,
+      customerName: fullName,
+      customerEmail: email,
+      total,
+      shippingAddress,
+      items: items.map((item: { name: string; qty: number; price: number }) => ({
+        name: item.name,
+        qty: item.qty,
+        price: item.price,
+      })),
+      generatedPassword,
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,

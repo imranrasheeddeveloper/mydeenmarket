@@ -1,13 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { Order } from "@/lib/admin-data-types";
 import { formatPrice } from "@/lib/data-types";
 
 export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<string | null>(null);
+  const [updateStatus, setUpdateStatus] = useState("");
+  const [updatePayment, setUpdatePayment] = useState("");
+  const [updating, setUpdating] = useState(false);
 
   const filtered = orders.filter((o) => {
     const matchesSearch =
@@ -33,6 +38,35 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
   };
 
   const detail = selectedOrder ? orders.find((o) => o.id === selectedOrder) : null;
+
+  const handleSelectOrder = (id: string) => {
+    const order = orders.find((o) => o.id === id);
+    if (order) {
+      setUpdateStatus(order.status);
+      setUpdatePayment(order.paymentStatus);
+    }
+    setSelectedOrder(id);
+  };
+
+  const handleUpdateOrder = async () => {
+    if (!selectedOrder) return;
+    setUpdating(true);
+    try {
+      const res = await fetch("/api/admin/orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: selectedOrder, status: updateStatus, paymentStatus: updatePayment }),
+      });
+      if (res.ok) {
+        setSelectedOrder(null);
+        router.refresh();
+      }
+    } catch {
+      // ignore
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -136,7 +170,7 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
                   </td>
                   <td className="px-5 py-4 text-right">
                     <button
-                      onClick={() => setSelectedOrder(order.id)}
+                      onClick={() => handleSelectOrder(order.id)}
                       className="p-2 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
                       title="View details"
                     >
@@ -217,15 +251,34 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
               </div>
 
               <div className="flex gap-2">
-                <select className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600">
-                  <option value="pending">Pending</option>
-                  <option value="processing">Processing</option>
-                  <option value="shipped">Shipped</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-                <button className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-sm font-medium transition-colors">
-                  Update
+                <div className="flex-1 space-y-2">
+                  <select
+                    value={updateStatus}
+                    onChange={(e) => setUpdateStatus(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                  <select
+                    value={updatePayment}
+                    onChange={(e) => setUpdatePayment(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600"
+                  >
+                    <option value="unpaid">Unpaid</option>
+                    <option value="paid">Paid</option>
+                    <option value="refunded">Refunded</option>
+                  </select>
+                </div>
+                <button
+                  onClick={handleUpdateOrder}
+                  disabled={updating}
+                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white rounded-lg text-sm font-medium transition-colors self-end"
+                >
+                  {updating ? "Saving..." : "Update"}
                 </button>
               </div>
             </div>

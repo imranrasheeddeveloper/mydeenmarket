@@ -135,4 +135,10 @@ model SiteConfig {
   socialFacebook        String @default("")
   socialInstagram       String @default("")
   socialYoutube         String @default("")
+  smtpHost              String @default("")
+  smtpPort              Int    @default(587)
+  smtpUser              String @default("")
+  smtpPass              String @default("")
+  smtpFrom              String @default("")
+  smtpSecure            Boolean @default(false)
 }
