@@ -1,0 +1,138 @@
+// Darussalam PK Database Schema
+// Using SQLite for zero-config local development
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String?
+  image     String?
+  role      String   @default("customer")
+  provider  String   @default("credentials")
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  count       Int       @default(0)
+  icon        String
+  gradient    String
+  description String
+  products    Product[]
+}
+
+model Collection {
+  id          String @id @default(cuid())
+  name        String
+  slug        String @unique
+  gradient    String
+  description String
+}
+
+model Product {
+  id             String      @id @default(cuid())
+  slug           String      @unique
+  name           String
+  nameUrdu       String?
+  author         String
+  vendor         String      @default("DARUSSALAM")
+  price          Int
+  compareAtPrice Int?
+  rating         Float       @default(5)
+  reviewCount    Int         @default(0)
+  category       String
+  categorySlug   String
+  badge          String?
+  description    String
+  features       String
+  language       String
+  pages          Int?
+  isbn           String?
+  weight         String?
+  dimensions     String?
+  inStock        Boolean     @default(true)
+  gradient       String
+  icon           String
+  createdAt      DateTime    @default(now())
+
+  categoryRef Category?   @relation(fields: [categorySlug], references: [slug])
+  orderItems  OrderItem[]
+}
+
+model Customer {
+  id          String    @id @default(cuid())
+  name        String
+  email       String    @unique
+  phone       String?
+  totalOrders Int       @default(0)
+  totalSpent  Int       @default(0)
+  joinedAt    DateTime  @default(now())
+  lastOrderAt DateTime?
+  orders      Order[]
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  customerName    String
+  customerEmail   String
+  total           Int
+  status          String      @default("pending")
+  paymentStatus   String      @default("unpaid")
+  shippingAddress String
+  createdAt       DateTime    @default(now())
+  items           OrderItem[]
+  customer        Customer?   @relation(fields: [customerEmail], references: [email])
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  name      String
+  qty       Int
+  price     Int
+  orderId   String
+  productId String?
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product? @relation(fields: [productId], references: [id])
+}
+
+model MonthlyRevenue {
+  id      String @id @default(cuid())
+  month   String
+  revenue Int
+  year    Int    @default(2026)
+}
+
+model TopProduct {
+  id      String @id @default(cuid())
+  name    String
+  sold    Int
+  revenue Int
+}
+
+model SiteConfig {
+  id                    String @id @default("main")
+  name                  String @default("Darussalam PK")
+  title                 String @default("")
+  description           String @default("")
+  url                   String @default("https://darussalam.pk")
+  address               String @default("")
+  email                 String @default("")
+  phone                 String @default("")
+  hours                 String @default("")
+  freeShippingThreshold Int    @default(5000)
+  socialFacebook        String @default("")
+  socialInstagram       String @default("")
+  socialYoutube         String @default("")
+}
