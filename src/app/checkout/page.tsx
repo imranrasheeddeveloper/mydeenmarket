@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
 import { formatPrice, siteConfig } from "@/lib/data-types";
 
 interface CartItem {
@@ -15,6 +16,10 @@ export default function CheckoutPage() {
   const [items, setItems] = useState<CartItem[]>([]);
   const [mounted, setMounted] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [orderNumber, setOrderNumber] = useState("");
+  const [generatedPassword, setGeneratedPassword] = useState("");
 
   const [form, setForm] = useState({
     firstName: "",
@@ -45,12 +50,48 @@ export default function CheckoutPage() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Clear cart after "order placed"
-    localStorage.setItem("cart", JSON.stringify([]));
-    window.dispatchEvent(new Event("cart-updated"));
-    setSubmitted(true);
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, items }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to place order");
+        setLoading(false);
+        return;
+      }
+
+      // Clear cart
+      localStorage.setItem("cart", JSON.stringify([]));
+      window.dispatchEvent(new Event("cart-updated"));
+
+      setOrderNumber(data.orderNumber);
+      setGeneratedPassword(data.generatedPassword || "");
+
+      // Auto sign-in the user
+      if (data.generatedPassword) {
+        await signIn("credentials", {
+          email: form.email,
+          password: data.generatedPassword,
+          redirect: false,
+        });
+      }
+
+      setSubmitted(true);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!mounted) {
@@ -71,15 +112,35 @@ export default function CheckoutPage() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Order Placed!</h1>
-          <p className="text-gray-600 mb-6">
-            JazakAllah Khair for your order. We&apos;ll send a confirmation to your email shortly.
+          <p className="text-gray-600 mb-2">
+            JazakAllah Khair for your order.
           </p>
-          <Link
-            href="/"
-            className="inline-block px-8 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg transition-colors"
-          >
-            Continue Shopping
-          </Link>
+          <p className="text-sm font-medium text-emerald-700 mb-4">
+            Order #: {orderNumber}
+          </p>
+          {generatedPassword && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4 text-left">
+              <p className="text-sm font-bold text-amber-800 mb-1">Your Account Has Been Created!</p>
+              <p className="text-sm text-amber-700 mb-2">You can track your orders by logging in:</p>
+              <p className="text-sm text-gray-700"><strong>Email:</strong> {form.email}</p>
+              <p className="text-sm text-gray-700"><strong>Password:</strong> {generatedPassword}</p>
+              <p className="text-xs text-amber-600 mt-2">Please save your password. You can change it later from your account page.</p>
+            </div>
+          )}
+          <div className="flex gap-3">
+            <Link
+              href="/account"
+              className="flex-1 px-4 py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-bold rounded-lg transition-colors text-sm"
+            >
+              My Orders
+            </Link>
+            <Link
+              href="/"
+              className="flex-1 px-4 py-3 border-2 border-emerald-700 text-emerald-700 hover:bg-emerald-50 font-bold rounded-lg transition-colors text-sm"
+            >
+              Continue Shopping
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -314,10 +375,24 @@ export default function CheckoutPage() {
               </div>
               <button
                 type="submit"
-                className="w-full mt-6 py-3.5 bg-[#C5A44E] hover:bg-[#A08839] text-[#0A3D2E] font-bold rounded-lg transition-colors uppercase tracking-wide text-sm"
+                disabled={loading}
+                className="w-full mt-6 py-3.5 bg-[#C5A44E] hover:bg-[#A08839] disabled:opacity-60 disabled:cursor-not-allowed text-[#0A3D2E] font-bold rounded-lg transition-colors uppercase tracking-wide text-sm"
               >
-                Place Order — {formatPrice(total)}
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Placing Order...
+                  </span>
+                ) : (
+                  <>Place Order — {formatPrice(total)}</>
+                )}
               </button>
+              {error && (
+                <p className="mt-3 text-sm text-red-600 text-center">{error}</p>
+              )}
               <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-500">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
