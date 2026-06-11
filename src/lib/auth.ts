@@ -107,6 +107,7 @@ export const authConfig: NextAuthConfig = {
   session: {
     strategy: "jwt",
   },
+  trustHost: true,
   secret: process.env.NEXTAUTH_SECRET || "mydeenmarket-secret-key-change-in-production",
 };
 
