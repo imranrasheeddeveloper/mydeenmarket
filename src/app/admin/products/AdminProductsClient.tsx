@@ -1,24 +1,130 @@
 "use client";
 
 import { useState } from "react";
-import type { Product } from "@/lib/data-types";
+import { useRouter } from "next/navigation";
+import type { Category, Product } from "@/lib/data-types";
 import { formatPrice } from "@/lib/data-types";
 
-export default function AdminProductsClient({ products: allProducts }: { products: Product[] }) {
+type ProductForm = {
+  name: string;
+  author: string;
+  vendor: string;
+  categorySlug: string;
+  price: string;
+  compareAtPrice: string;
+  language: string;
+  pages: string;
+  isbn: string;
+  weight: string;
+  dimensions: string;
+  badge: string;
+  description: string;
+  featuresText: string;
+};
+
+const EMPTY_FORM: ProductForm = {
+  name: "",
+  author: "",
+  vendor: "",
+  categorySlug: "",
+  price: "",
+  compareAtPrice: "",
+  language: "",
+  pages: "",
+  isbn: "",
+  weight: "",
+  dimensions: "",
+  badge: "",
+  description: "",
+  featuresText: "",
+};
+
+export default function AdminProductsClient({
+  products: allProducts,
+  categories,
+}: {
+  products: Product[];
+  categories: Category[];
+}) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
 
   const filtered = allProducts.filter(
-    (p) =>
+    (p) => {
+      const matchesText =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.author.toLowerCase().includes(search.toLowerCase()) ||
-      p.category.toLowerCase().includes(search.toLowerCase())
+      p.category.toLowerCase().includes(search.toLowerCase());
+      const matchesCategory = !categoryFilter || p.categorySlug === categoryFilter;
+      return matchesText && matchesCategory;
+    }
   );
 
   const badgeStyles: Record<string, string> = {
     bestseller: "bg-amber-50 text-amber-700",
     new: "bg-emerald-50 text-emerald-700",
     sale: "bg-red-50 text-red-700",
+  };
+
+  const resetModal = () => {
+    setForm(EMPTY_FORM);
+    setErrorMsg("");
+    setSubmitting(false);
+    setShowAddModal(false);
+  };
+
+  const handleAddProduct = async () => {
+    if (!form.name || !form.categorySlug || !form.description || !form.price) {
+      setErrorMsg("Please fill all required fields.");
+      return;
+    }
+
+    setSubmitting(true);
+    setErrorMsg("");
+
+    try {
+      const response = await fetch("/api/admin/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          author: form.author,
+          vendor: form.vendor,
+          categorySlug: form.categorySlug,
+          price: Number(form.price),
+          compareAtPrice: form.compareAtPrice ? Number(form.compareAtPrice) : null,
+          language: form.language,
+          pages: form.pages ? Number(form.pages) : null,
+          isbn: form.isbn || null,
+          weight: form.weight || null,
+          dimensions: form.dimensions || null,
+          badge: form.badge || null,
+          description: form.description,
+          features: form.featuresText
+            .split("\n")
+            .map((f) => f.trim())
+            .filter(Boolean),
+        }),
+      });
+
+      const payload = await response.json();
+      if (!response.ok) {
+        setErrorMsg(payload.error || "Failed to create product.");
+        setSubmitting(false);
+        return;
+      }
+
+      resetModal();
+      router.refresh();
+    } catch {
+      setErrorMsg("Request failed. Please try again.");
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -29,7 +135,10 @@ export default function AdminProductsClient({ products: allProducts }: { product
           <p className="text-sm text-gray-500 mt-1">{allProducts.length} total products</p>
         </div>
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={() => {
+            setShowAddModal(true);
+            setErrorMsg("");
+          }}
           className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-sm font-medium transition-colors flex items-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,13 +161,17 @@ export default function AdminProductsClient({ products: allProducts }: { product
             className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
           />
         </div>
-        <select className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600">
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600"
+        >
           <option value="">All Categories</option>
-          <option value="quran">Quran</option>
-          <option value="hadith">Hadith</option>
-          <option value="seerah">Seerah</option>
-          <option value="prayer">Prayer</option>
-          <option value="health">Health</option>
+          {categories.map((c) => (
+            <option key={c.slug} value={c.slug}>
+              {c.name}
+            </option>
+          ))}
         </select>
         <select className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600">
           <option value="">All Status</option>
@@ -156,7 +269,7 @@ export default function AdminProductsClient({ products: allProducts }: { product
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
               <h2 className="text-lg font-bold text-gray-900">Add New Product</h2>
-              <button onClick={() => setShowAddModal(false)} className="p-2 text-gray-500 hover:text-gray-700" aria-label="Close">
+              <button onClick={resetModal} className="p-2 text-gray-500 hover:text-gray-700" aria-label="Close">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -166,69 +279,171 @@ export default function AdminProductsClient({ products: allProducts }: { product
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Product Name *</label>
-                  <input type="text" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" placeholder="e.g. The Noble Quran" />
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                    placeholder="e.g. Premium Abaya, Digital Tasbih, Zamzam Water"
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Author *</label>
-                  <input type="text" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" placeholder="Author name" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Brand / Author</label>
+                  <input
+                    type="text"
+                    value={form.author}
+                    onChange={(e) => setForm((prev) => ({ ...prev, author: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                    placeholder="Brand name or author"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Vendor</label>
+                  <input
+                    type="text"
+                    value={form.vendor}
+                    onChange={(e) => setForm((prev) => ({ ...prev, vendor: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                    placeholder="e.g. MyDeenMarket"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Category *</label>
-                  <select className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600">
+                  <select
+                    value={form.categorySlug}
+                    onChange={(e) => setForm((prev) => ({ ...prev, categorySlug: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600"
+                  >
                     <option value="">Select category</option>
-                    <option>Quran</option><option>Hadith</option><option>Seerah</option>
-                    <option>Prayer</option><option>Fiqh</option><option>Health</option>
-                    <option>Biography</option><option>Children</option>
+                    {categories.map((c) => (
+                      <option key={c.slug} value={c.slug}>
+                        {c.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Price (PKR) *</label>
-                  <input type="number" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" placeholder="0" />
+                  <input
+                    type="number"
+                    value={form.price}
+                    onChange={(e) => setForm((prev) => ({ ...prev, price: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                    placeholder="0"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Compare Price (PKR)</label>
-                  <input type="number" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" placeholder="Optional" />
+                  <input
+                    type="number"
+                    value={form.compareAtPrice}
+                    onChange={(e) => setForm((prev) => ({ ...prev, compareAtPrice: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                    placeholder="Optional"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Language</label>
-                  <select className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600">
-                    <option>Urdu</option><option>English</option><option>Arabic</option>
-                    <option>Arabic/Urdu</option><option>Arabic/English</option>
-                  </select>
+                  <input
+                    type="text"
+                    value={form.language}
+                    onChange={(e) => setForm((prev) => ({ ...prev, language: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                    placeholder="e.g. Urdu, English, N/A"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Pages</label>
-                  <input type="number" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" placeholder="0" />
+                  <input
+                    type="number"
+                    value={form.pages}
+                    onChange={(e) => setForm((prev) => ({ ...prev, pages: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                    placeholder="For books only"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">ISBN</label>
-                  <input type="text" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" placeholder="978-..." />
+                  <input
+                    type="text"
+                    value={form.isbn}
+                    onChange={(e) => setForm((prev) => ({ ...prev, isbn: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                    placeholder="Optional"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Weight</label>
-                  <input type="text" className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600" placeholder="e.g. 500g" />
+                  <input
+                    type="text"
+                    value={form.weight}
+                    onChange={(e) => setForm((prev) => ({ ...prev, weight: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                    placeholder="e.g. 500g"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Dimensions</label>
+                  <input
+                    type="text"
+                    value={form.dimensions}
+                    onChange={(e) => setForm((prev) => ({ ...prev, dimensions: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                    placeholder="e.g. 14 x 21 cm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Badge</label>
+                  <select
+                    value={form.badge}
+                    onChange={(e) => setForm((prev) => ({ ...prev, badge: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600"
+                  >
+                    <option value="">None</option>
+                    <option value="new">New</option>
+                    <option value="bestseller">Best Seller</option>
+                    <option value="sale">Sale</option>
+                  </select>
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Description *</label>
-                  <textarea rows={4} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600 resize-none" placeholder="Product description..." />
+                  <textarea
+                    rows={4}
+                    value={form.description}
+                    onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600 resize-none"
+                    placeholder="Product description..."
+                  />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Product Image</label>
-                  <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center hover:border-emerald-400 transition-colors cursor-pointer">
-                    <svg className="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <p className="text-sm text-gray-500">Click to upload or drag and drop</p>
-                    <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</p>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Features (one per line)</label>
+                  <textarea
+                    rows={4}
+                    value={form.featuresText}
+                    onChange={(e) => setForm((prev) => ({ ...prev, featuresText: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600 resize-none"
+                    placeholder={"Feature 1\nFeature 2\nFeature 3"}
+                  />
+                </div>
+                {errorMsg && (
+                  <div className="sm:col-span-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                    {errorMsg}
                   </div>
+                )}
+                <div className="sm:col-span-2 text-xs text-gray-500">
+                  Tip: choose Islamic Products category for Abaya, Tasbih, Zamzam, fragrances, prayer mats and similar items.
                 </div>
               </div>
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
-                <button onClick={() => setShowAddModal(false)} className="px-5 py-2.5 border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors">
+                <button onClick={resetModal} className="px-5 py-2.5 border border-gray-200 text-gray-700 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors">
                   Cancel
                 </button>
-                <button className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-sm font-medium transition-colors">
-                  Add Product
+                <button
+                  onClick={handleAddProduct}
+                  disabled={submitting}
+                  className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white rounded-xl text-sm font-medium transition-colors"
+                >
+                  {submitting ? "Adding..." : "Add Product"}
                 </button>
               </div>
             </div>
