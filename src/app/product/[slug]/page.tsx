@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
-import { getProductBySlug, getProductsByCategory, formatPrice } from "@/lib/data";
+import ProductReviews from "@/components/ProductReviews";
+import { getProductBySlug, getProductsByCategory, getProductReviews, formatPrice } from "@/lib/data";
 import { generatePageMetadata, generateProductSchema, generateBreadcrumbSchema } from "@/lib/seo";
 import AddToCartButton from "./AddToCartButton";
 
@@ -36,6 +37,7 @@ export default async function ProductPage({ params }: { params: Params }) {
   }
 
   const categoryProducts = await getProductsByCategory(product.categorySlug);
+  const productReviews = await getProductReviews(product.id);
   const related = categoryProducts
     .filter((p) => p.id !== product.id)
     .slice(0, 4);
@@ -259,6 +261,8 @@ export default async function ProductPage({ params }: { params: Params }) {
             </div>
           </div>
         </div>
+
+        <ProductReviews productId={product.id} initialReviews={productReviews} />
 
         {/* Related Products */}
         {related.length > 0 && (

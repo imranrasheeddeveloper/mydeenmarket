@@ -44,6 +44,16 @@ export interface Collection {
   description: string;
 }
 
+export interface ProductReview {
+  id: string;
+  productId: string;
+  customerName: string;
+  customerEmail?: string | null;
+  rating: number;
+  comment: string;
+  createdAt: string;
+}
+
 export const siteConfig = {
   name: "MyDeenMarket",
   title: "MyDeenMarket — Islamic Books & Products Pakistan",

@@ -4,11 +4,36 @@
 
 import "server-only";
 import { prisma } from "./prisma";
-import type { Product, Category, Collection } from "./data-types";
+import type { Product, Category, Collection, ProductReview } from "./data-types";
 
 // Re-export types and utilities for convenience
-export type { Product, Category, Collection } from "./data-types";
+export type { Product, Category, Collection, ProductReview } from "./data-types";
 export { siteConfig, formatPrice } from "./data-types";
+
+let reviewTableReady = false;
+
+async function ensureReviewsTable() {
+  if (reviewTableReady) return;
+
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS ProductReview (
+      id TEXT PRIMARY KEY,
+      productId TEXT NOT NULL,
+      customerName TEXT NOT NULL,
+      customerEmail TEXT,
+      rating INTEGER NOT NULL,
+      comment TEXT NOT NULL,
+      createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (productId) REFERENCES Product(id) ON DELETE CASCADE
+    )
+  `);
+
+  await prisma.$executeRawUnsafe(
+    `CREATE INDEX IF NOT EXISTS ProductReview_productId_createdAt_idx ON ProductReview (productId, createdAt DESC)`
+  );
+
+  reviewTableReady = true;
+}
 
 // Map DB product row to Product interface (parse features JSON)
 function mapProduct(row: {
@@ -157,4 +182,36 @@ export async function getAllProductSlugs(): Promise<string[]> {
 export async function getAllCategorySlugs(): Promise<string[]> {
   const rows = await prisma.category.findMany({ select: { slug: true } });
   return rows.map((r) => r.slug);
+}
+
+export async function getProductReviews(
+  productId: string,
+  limit = 20
+): Promise<ProductReview[]> {
+  await ensureReviewsTable();
+
+  const rows = await prisma.$queryRawUnsafe<
+    Array<{
+      id: string;
+      productId: string;
+      customerName: string;
+      customerEmail: string | null;
+      rating: number;
+      comment: string;
+      createdAt: string;
+    }>
+  >(
+    `SELECT id, productId, customerName, customerEmail, rating, comment, createdAt
+     FROM ProductReview
+     WHERE productId = ?
+     ORDER BY datetime(createdAt) DESC
+     LIMIT ?`,
+    productId,
+    limit
+  );
+
+  return rows.map((row) => ({
+    ...row,
+    createdAt: new Date(row.createdAt).toISOString(),
+  }));
 }
