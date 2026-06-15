@@ -6,8 +6,10 @@ import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import AuthProvider from "@/components/AuthProvider";
 import { CurrencyProvider } from "@/components/CurrencyProvider";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import { siteConfig } from "@/lib/data-types";
 import { getCategories, getSearchableProducts } from "@/lib/data";
+import { prisma } from "@/lib/prisma";
 import { generateOrganizationSchema, generateWebSiteSchema, generateSiteNavigationSchema } from "@/lib/seo";
 
 const inter = Inter({
@@ -127,10 +129,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [categories, searchableProducts] = await Promise.all([
+  const [categories, searchableProducts, whatsappConfig] = await Promise.all([
     getCategories(),
     getSearchableProducts(),
+    prisma.siteConfig.findFirst({ select: { whatsappNumber: true } }),
   ]);
+  const whatsappNumber = whatsappConfig?.whatsappNumber || "+923035036392";
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} h-full`}>
       <head>
@@ -187,6 +191,7 @@ export default async function RootLayout({
             </main>
             <Footer />
             <CartDrawer />
+            <WhatsAppButton number={whatsappNumber} />
           </CurrencyProvider>
         </AuthProvider>
       </body>

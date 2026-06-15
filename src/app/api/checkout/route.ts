@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendOrderConfirmation } from "@/lib/email";
+import { sendWhatsAppOrderNotification } from "@/lib/whatsapp";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
@@ -166,6 +167,21 @@ export async function POST(req: NextRequest) {
         price: item.price,
       })),
       generatedPassword,
+    }).catch(() => {});
+
+    // --- Send WhatsApp order notification to admin (async, don't block response) ---
+    sendWhatsAppOrderNotification({
+      orderNumber: order.orderNumber,
+      customerName: fullName,
+      customerEmail: email,
+      phone,
+      total,
+      shippingAddress,
+      items: items.map((item: { name: string; qty: number; price: number }) => ({
+        name: item.name,
+        qty: item.qty,
+        price: item.price,
+      })),
     }).catch(() => {});
 
     return NextResponse.json({

@@ -143,4 +143,7 @@ model SiteConfig {
   smtpPass              String @default("")
   smtpFrom              String @default("")
   smtpSecure            Boolean @default(false)
+  whatsappNumber        String @default("+923035036392")
+  whatsappPhoneId       String @default("")
+  whatsappToken         String @default("")
 }

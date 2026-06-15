@@ -34,6 +34,9 @@ export async function GET() {
       smtpPass: config.smtpPass,
       smtpFrom: config.smtpFrom,
       smtpSecure: config.smtpSecure,
+      whatsappNumber: config.whatsappNumber,
+      whatsappPhoneId: config.whatsappPhoneId,
+      whatsappToken: config.whatsappToken,
     });
   } catch (error) {
     console.error("Settings fetch error:", error);
@@ -71,6 +74,9 @@ export async function PUT(req: NextRequest) {
         smtpPass: body.smtpPass || "",
         smtpFrom: body.smtpFrom || "",
         smtpSecure: Boolean(body.smtpSecure),
+        whatsappNumber: body.whatsappNumber || "+923035036392",
+        whatsappPhoneId: body.whatsappPhoneId || "",
+        whatsappToken: body.whatsappToken || "",
       },
       create: {
         id: "main",
@@ -92,6 +98,9 @@ export async function PUT(req: NextRequest) {
         smtpPass: body.smtpPass || "",
         smtpFrom: body.smtpFrom || "",
         smtpSecure: Boolean(body.smtpSecure),
+        whatsappNumber: body.whatsappNumber || "+923035036392",
+        whatsappPhoneId: body.whatsappPhoneId || "",
+        whatsappToken: body.whatsappToken || "",
       },
     });
 
