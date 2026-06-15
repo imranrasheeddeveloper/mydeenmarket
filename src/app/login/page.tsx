@@ -124,9 +124,6 @@ export default function LoginPage() {
             </Link>
           </p>
 
-          <div className="mt-4 p-3 bg-amber-50 rounded-lg text-xs text-amber-700">
-            Admin login — contact support for access.
-          </div>
         </div>
       </div>
     </div>
