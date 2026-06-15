@@ -199,20 +199,27 @@ export default async function ProductPage({ params }: { params: Params }) {
               )}
             </div>
 
-            {/* Description */}
+            {/* Description — HTML (WYSIWYG) or legacy markdown */}
             <div className="text-gray-600 leading-relaxed mb-6" itemProp="description">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
-                  ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 mb-3">{children}</ul>,
-                  ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 mb-3">{children}</ol>,
-                  li: ({ children }) => <li>{children}</li>,
-                  strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
-                }}
-              >
-                {product.description}
-              </ReactMarkdown>
+              {product.description.trimStart().startsWith("<") ? (
+                <div
+                  className="wysiwyg-content"
+                  dangerouslySetInnerHTML={{ __html: product.description }}
+                />
+              ) : (
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
+                    ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 mb-3">{children}</ul>,
+                    ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 mb-3">{children}</ol>,
+                    li: ({ children }) => <li>{children}</li>,
+                    strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+                  }}
+                >
+                  {product.description}
+                </ReactMarkdown>
+              )}
             </div>
 
             {/* Features */}
