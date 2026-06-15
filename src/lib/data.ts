@@ -58,6 +58,7 @@ function mapProduct(row: {
   weight: string | null;
   dimensions: string | null;
   imageUrl: string | null;
+  stockQty: number;
   inStock: boolean;
   gradient: string;
   icon: string;
@@ -166,11 +167,24 @@ export async function searchProducts(query: string): Promise<Product[]> {
     where: {
       OR: [
         { name: { contains: q } },
+        { slug: { contains: q } },
         { author: { contains: q } },
+        { vendor: { contains: q } },
+        { categorySlug: { contains: q } },
         { category: { contains: q } },
         { description: { contains: q } },
+        { language: { contains: q } },
+        { isbn: { contains: q } },
       ],
     },
+  });
+  return rows.map(mapProduct);
+}
+
+export async function getSearchableProducts(limit = 150): Promise<Product[]> {
+  const rows = await prisma.product.findMany({
+    orderBy: { name: "asc" },
+    take: limit,
   });
   return rows.map(mapProduct);
 }

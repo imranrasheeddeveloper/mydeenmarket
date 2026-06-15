@@ -5,16 +5,28 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { siteConfig } from "@/lib/data-types";
-import type { Category } from "@/lib/data-types";
+import type { Category, Product } from "@/lib/data-types";
 import CurrencySelector from "@/components/CurrencySelector";
 
-export default function Header({ categories = [] }: { categories?: Category[] }) {
+type SearchableProduct = Pick<
+  Product,
+  "id" | "slug" | "name" | "author" | "category" | "categorySlug" | "vendor" | "description" | "features"
+>;
+
+export default function Header({
+  categories = [],
+  searchableProducts = [],
+}: {
+  categories?: Category[];
+  searchableProducts?: SearchableProduct[];
+}) {
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [mobileSearchQuery, setMobileSearchQuery] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -60,6 +72,52 @@ export default function Header({ categories = [] }: { categories?: Category[] })
   const filteredSearches = searchQuery.trim()
     ? popularSearches.filter(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
     : popularSearches;
+
+  const desktopTerms = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  const mobileTerms = mobileSearchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
+
+  const matchesTerms = (haystack: string, terms: string[]) =>
+    terms.every((term) => haystack.includes(term));
+
+  const matchedProducts = desktopTerms.length > 0
+    ? searchableProducts
+        .filter((p) => {
+          const searchable = [
+            p.name,
+            p.slug,
+            p.author,
+            p.category,
+            p.categorySlug,
+            p.vendor,
+            p.description,
+            ...(p.features || []),
+          ]
+            .join(" ")
+            .toLowerCase();
+          return matchesTerms(searchable, desktopTerms);
+        })
+        .slice(0, 6)
+    : [];
+
+  const matchedMobileProducts = mobileTerms.length > 0
+    ? searchableProducts
+        .filter((p) => {
+          const searchable = [
+            p.name,
+            p.slug,
+            p.author,
+            p.category,
+            p.categorySlug,
+            p.vendor,
+            p.description,
+            ...(p.features || []),
+          ]
+            .join(" ")
+            .toLowerCase();
+          return matchesTerms(searchable, mobileTerms);
+        })
+        .slice(0, 6)
+    : [];
 
   const mainCategories = categories.slice(0, 8);
 
@@ -115,6 +173,32 @@ export default function Header({ categories = [] }: { categories?: Category[] })
                   <div className="p-5">
                     {/* Popular Searches */}
                     <div className="mb-5">
+                      {searchQuery.trim() && (
+                        <div className="mb-5">
+                          <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-3">Products</h4>
+                          {matchedProducts.length > 0 ? (
+                            <div className="space-y-1">
+                              {matchedProducts.map((product) => (
+                                <Link
+                                  key={product.id}
+                                  href={`/product/${product.slug}`}
+                                  onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+                                >
+                                  <div className="min-w-0">
+                                    <p className="text-sm text-slate-800 truncate">{product.name}</p>
+                                    <p className="text-xs text-slate-500 truncate">{product.category} {product.author ? `• ${product.author}` : ""}</p>
+                                  </div>
+                                  <span className="text-xs text-[#d4a853]">View</span>
+                                </Link>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-slate-500">No direct product matches. Press Enter to search all products.</p>
+                          )}
+                        </div>
+                      )}
+
                       <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-3 flex items-center gap-2">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
                         Popular Searches
@@ -255,6 +339,8 @@ export default function Header({ categories = [] }: { categories?: Category[] })
                 mobileSearchOpen ? "border-[#d4a853]/50 rounded-t-xl rounded-b-none bg-white" : "border-slate-200 rounded-full"
               }`}
               aria-label="Search products"
+              value={mobileSearchQuery}
+              onChange={(e) => setMobileSearchQuery(e.target.value)}
               onFocus={() => setMobileSearchOpen(true)}
               autoComplete="off"
             />
@@ -265,10 +351,32 @@ export default function Header({ categories = [] }: { categories?: Category[] })
           {mobileSearchOpen && (
             <div className="absolute left-4 right-4 bg-white border border-t-0 border-slate-200 rounded-b-xl shadow-lg z-50">
               <div className="p-4">
+                {mobileSearchQuery.trim() && (
+                  <div className="mb-3">
+                    <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-2">Products</h4>
+                    {matchedMobileProducts.length > 0 ? (
+                      <div className="space-y-1">
+                        {matchedMobileProducts.map((product) => (
+                          <Link
+                            key={product.id}
+                            href={`/product/${product.slug}`}
+                            onClick={() => { setMobileSearchOpen(false); setMobileSearchQuery(""); }}
+                            className="block px-2.5 py-2 rounded-lg hover:bg-slate-50"
+                          >
+                            <p className="text-sm text-slate-700 truncate">{product.name}</p>
+                            <p className="text-xs text-slate-500 truncate">{product.category}</p>
+                          </Link>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-slate-500">No direct matches. Submit search to view all results.</p>
+                    )}
+                  </div>
+                )}
                 <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-2">Popular Searches</h4>
                 <div className="flex flex-wrap gap-1.5">
                   {popularSearches.map((term) => (
-                    <Link key={term} href={`/collections?q=${encodeURIComponent(term)}`} onClick={() => setMobileSearchOpen(false)} className="px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-full text-xs text-slate-600 hover:bg-[#d4a853]/10 hover:border-[#d4a853]/30 transition-all">{term}</Link>
+                    <Link key={term} href={`/collections?q=${encodeURIComponent(term)}`} onClick={() => { setMobileSearchOpen(false); setMobileSearchQuery(""); }} className="px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-full text-xs text-slate-600 hover:bg-[#d4a853]/10 hover:border-[#d4a853]/30 transition-all">{term}</Link>
                   ))}
                 </div>
                 <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 mt-3 mb-2">Categories</h4>

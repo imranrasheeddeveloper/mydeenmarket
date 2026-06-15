@@ -24,6 +24,7 @@ export interface Product {
   weight?: string | null;
   dimensions?: string | null;
   imageUrl?: string | null;
+  stockQty: number;
   inStock: boolean;
   gradient: string;
   icon: string;

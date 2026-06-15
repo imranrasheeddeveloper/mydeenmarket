@@ -17,6 +17,7 @@ type CreatePayload = {
   weight?: string | null;
   dimensions?: string | null;
   imageUrl?: string | null;
+  stockQty?: number;
   inStock?: boolean;
   badge?: string | null;
 };
@@ -50,6 +51,9 @@ export async function POST(req: NextRequest) {
     const category = await prisma.category.findUnique({
       where: { slug: body.categorySlug },
     });
+
+    const parsedStockQty = Number(body.stockQty ?? 0);
+    const stockQty = Number.isFinite(parsedStockQty) ? Math.max(0, Math.trunc(parsedStockQty)) : 0;
 
     if (!category) {
       return NextResponse.json({ error: "Invalid category" }, { status: 400 });
@@ -89,7 +93,8 @@ export async function POST(req: NextRequest) {
         weight: body.weight ?? null,
         dimensions: body.dimensions ?? null,
         imageUrl: body.imageUrl?.trim() || null,
-        inStock: body.inStock ?? true,
+        stockQty,
+        inStock: stockQty > 0,
         gradient: category.gradient,
         icon: category.icon,
       },

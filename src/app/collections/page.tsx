@@ -21,17 +21,36 @@ export default async function CollectionsPage({
   const params = await searchParams;
   const query = params.q?.toLowerCase() || "";
   const filter = params.filter || "";
+  const queryTerms = query.split(/\s+/).map((t) => t.trim()).filter(Boolean);
 
   const [products, categories] = await Promise.all([getProducts(), getCategories()]);
 
   let filtered = products;
   if (query) {
+    const matchesAllTerms = (source: string) =>
+      queryTerms.every((term) => source.includes(term));
+
     filtered = products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(query) ||
-        p.author.toLowerCase().includes(query) ||
-        p.category.toLowerCase().includes(query) ||
-        p.description.toLowerCase().includes(query)
+      (p) => {
+        const searchable = [
+          p.name,
+          p.slug,
+          p.nameUrdu || "",
+          p.author,
+          p.vendor,
+          p.category,
+          p.categorySlug,
+          p.description,
+          p.language,
+          p.isbn || "",
+          p.badge || "",
+          ...(p.features || []),
+        ]
+          .join(" ")
+          .toLowerCase();
+
+        return matchesAllTerms(searchable);
+      }
     );
   }
   if (filter === "bestseller") {

@@ -7,7 +7,7 @@ import CartDrawer from "@/components/CartDrawer";
 import AuthProvider from "@/components/AuthProvider";
 import { CurrencyProvider } from "@/components/CurrencyProvider";
 import { siteConfig } from "@/lib/data-types";
-import { getCategories } from "@/lib/data";
+import { getCategories, getSearchableProducts } from "@/lib/data";
 import { generateOrganizationSchema, generateWebSiteSchema, generateSiteNavigationSchema } from "@/lib/seo";
 
 const inter = Inter({
@@ -127,7 +127,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const categories = await getCategories();
+  const [categories, searchableProducts] = await Promise.all([
+    getCategories(),
+    getSearchableProducts(),
+  ]);
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} h-full`}>
       <head>
@@ -178,7 +181,7 @@ export default async function RootLayout({
             <a href="#main-content" className="skip-link">
               Skip to content
             </a>
-            <Header categories={categories} />
+            <Header categories={categories} searchableProducts={searchableProducts} />
             <main id="main-content" className="flex-1">
               {children}
             </main>

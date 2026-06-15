@@ -9,6 +9,7 @@ type ProductForm = {
   id?: string;
   name: string;
   imageUrl: string;
+  stockQty: string;
   author: string;
   vendor: string;
   categorySlug: string;
@@ -20,7 +21,6 @@ type ProductForm = {
   weight: string;
   dimensions: string;
   badge: string;
-  inStock: boolean;
   description: string;
   featuresText: string;
 };
@@ -29,6 +29,7 @@ const EMPTY_FORM: ProductForm = {
   id: undefined,
   name: "",
   imageUrl: "",
+  stockQty: "0",
   author: "",
   vendor: "",
   categorySlug: "",
@@ -40,7 +41,6 @@ const EMPTY_FORM: ProductForm = {
   weight: "",
   dimensions: "",
   badge: "",
-  inStock: true,
   description: "",
   featuresText: "",
 };
@@ -58,6 +58,7 @@ export default function AdminProductsClient({
   const [statusFilter, setStatusFilter] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
 
@@ -96,6 +97,7 @@ export default function AdminProductsClient({
       id: product.id,
       name: product.name,
       imageUrl: product.imageUrl || "",
+      stockQty: String(product.stockQty ?? 0),
       author: product.author,
       vendor: product.vendor,
       categorySlug: product.categorySlug,
@@ -107,12 +109,41 @@ export default function AdminProductsClient({
       weight: product.weight || "",
       dimensions: product.dimensions || "",
       badge: product.badge || "",
-      inStock: product.inStock,
       description: product.description,
       featuresText: product.features.join("\n"),
     });
     setErrorMsg("");
     setShowAddModal(true);
+  };
+
+  const handleImageUpload = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      setErrorMsg("Please select an image file.");
+      return;
+    }
+
+    setUploadingImage(true);
+    setErrorMsg("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/admin/uploads/product-image", {
+        method: "POST",
+        body: fd,
+      });
+
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (!res.ok || !data.url) {
+        setErrorMsg(data.error || "Image upload failed.");
+        return;
+      }
+
+      setForm((prev) => ({ ...prev, imageUrl: data.url || "" }));
+    } catch {
+      setErrorMsg("Image upload request failed.");
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handleSaveProduct = async () => {
@@ -134,6 +165,7 @@ export default function AdminProductsClient({
         body: JSON.stringify({
           name: form.name,
           imageUrl: form.imageUrl || null,
+          stockQty: Number(form.stockQty || "0"),
           author: form.author,
           vendor: form.vendor,
           categorySlug: form.categorySlug,
@@ -145,7 +177,6 @@ export default function AdminProductsClient({
           weight: form.weight || null,
           dimensions: form.dimensions || null,
           badge: form.badge || null,
-          inStock: form.inStock,
           description: form.description,
           features: form.featuresText
             .split("\n")
@@ -196,7 +227,7 @@ export default function AdminProductsClient({
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          inStock: nextInStock,
+          stockQty: nextInStock ? 1 : 0,
         }),
       });
 
@@ -278,7 +309,7 @@ export default function AdminProductsClient({
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-5 py-3 hidden md:table-cell">Category</th>
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-5 py-3">Price</th>
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-5 py-3 hidden lg:table-cell">Rating</th>
-                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-5 py-3 hidden sm:table-cell">Status</th>
+                <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-5 py-3 hidden sm:table-cell">Inventory</th>
                 <th className="text-right text-xs font-medium text-gray-500 uppercase tracking-wider px-5 py-3">Actions</th>
               </tr>
             </thead>
@@ -322,20 +353,20 @@ export default function AdminProductsClient({
                   </td>
                   <td className="px-5 py-4 hidden sm:table-cell">
                     <div className="flex items-center gap-2">
-                      {product.inStock ? (
+                      {product.stockQty > 0 ? (
                         <button
                           onClick={() => handleToggleStock(product.id, false)}
                           className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium transition-colors"
                         >
                           <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                          In Stock
+                          {product.stockQty} in stock
                         </button>
                       ) : (
                         <button
                           onClick={() => handleToggleStock(product.id, true)}
                           className="px-2 py-0.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-full text-xs font-medium transition-colors"
                         >
-                          Out of Stock
+                          Out of Stock (0)
                         </button>
                       )}
                       {product.badge && (
@@ -399,14 +430,33 @@ export default function AdminProductsClient({
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Photo URL</label>
-                  <input
-                    type="url"
-                    value={form.imageUrl}
-                    onChange={(e) => setForm((prev) => ({ ...prev, imageUrl: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
-                    placeholder="https://example.com/product-image.jpg"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Product Photo (Upload & Compress)</label>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          void handleImageUpload(file);
+                        }
+                      }}
+                      className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                    />
+                    {uploadingImage ? <span className="text-xs text-gray-500 self-center">Uploading...</span> : null}
+                  </div>
+                  {form.imageUrl ? (
+                    <div className="mt-3 flex items-center gap-3">
+                      <img src={form.imageUrl} alt="Preview" className="w-16 h-20 rounded-md object-cover border border-gray-100" />
+                      <button
+                        type="button"
+                        onClick={() => setForm((prev) => ({ ...prev, imageUrl: "" }))}
+                        className="text-xs text-red-600 hover:text-red-700"
+                      >
+                        Remove image
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Brand / Author</label>
@@ -527,15 +577,15 @@ export default function AdminProductsClient({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Stock Status</label>
-                  <select
-                    value={form.inStock ? "instock" : "outofstock"}
-                    onChange={(e) => setForm((prev) => ({ ...prev, inStock: e.target.value === "instock" }))}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600"
-                  >
-                    <option value="instock">In Stock</option>
-                    <option value="outofstock">Out of Stock</option>
-                  </select>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Stock Quantity *</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={form.stockQty}
+                    onChange={(e) => setForm((prev) => ({ ...prev, stockQty: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                    placeholder="e.g. 25"
+                  />
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Description *</label>

@@ -17,6 +17,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
     }
 
+    if (items.some((item: { qty?: number }) => !item.qty || item.qty <= 0)) {
+      return NextResponse.json({ error: "Invalid item quantity" }, { status: 400 });
+    }
+
     const fullName = `${firstName} ${lastName}`;
     const shippingAddress = `${address}, ${city}, ${state}${zip ? ` ${zip}` : ""}\nPhone: ${phone}${notes ? `\nNotes: ${notes}` : ""}`;
 
@@ -36,10 +40,23 @@ export async function POST(req: NextRequest) {
     const existingProducts = productIds.length > 0
       ? await prisma.product.findMany({
           where: { id: { in: productIds } },
-          select: { id: true },
+          select: { id: true, name: true, stockQty: true },
         })
       : [];
     const validProductIds = new Set(existingProducts.map((p) => p.id));
+    const productById = new Map(existingProducts.map((p) => [p.id, p]));
+
+    for (const item of items as Array<{ id?: string; name: string; qty: number }>) {
+      if (!item.id || !validProductIds.has(item.id)) continue;
+      const dbProduct = productById.get(item.id);
+      if (!dbProduct) continue;
+      if (dbProduct.stockQty < item.qty) {
+        return NextResponse.json(
+          { error: `Insufficient stock for ${dbProduct.name}. Available: ${dbProduct.stockQty}` },
+          { status: 409 }
+        );
+      }
+    }
 
     // --- Auto-create User if not exists ---
     let user = await prisma.user.findUnique({ where: { email } });
@@ -74,36 +91,66 @@ export async function POST(req: NextRequest) {
     }
 
     // --- Create Order with items ---
-    const order = await prisma.order.create({
-      data: {
-        orderNumber,
-        customerName: fullName,
-        customerEmail: email,
-        total,
-        status: "pending",
-        paymentStatus: "unpaid",
-        shippingAddress,
-        items: {
-          create: items.map((item: { id: string; name: string; qty: number; price: number }) => ({
-            name: item.name,
-            qty: item.qty,
-            price: item.price,
-            productId: item.id && validProductIds.has(item.id) ? item.id : undefined,
-          })),
-        },
-      },
-    });
+    const order = await prisma.$transaction(async (tx) => {
+      for (const item of items as Array<{ id?: string; qty: number }>) {
+        if (!item.id || !validProductIds.has(item.id)) continue;
+        const updated = await tx.product.updateMany({
+          where: {
+            id: item.id,
+            stockQty: { gte: item.qty },
+          },
+          data: {
+            stockQty: { decrement: item.qty },
+          },
+        });
 
-    // --- Update Customer stats ---
-    await prisma.customer.update({
-      where: { email },
-      data: {
-        totalOrders: { increment: 1 },
-        totalSpent: { increment: total },
-        lastOrderAt: new Date(),
-        name: fullName,
-        phone,
-      },
+        if (updated.count === 0) {
+          throw new Error("STOCK_CONFLICT");
+        }
+      }
+
+      await tx.product.updateMany({
+        where: { stockQty: { lte: 0 } },
+        data: { inStock: false },
+      });
+
+      await tx.product.updateMany({
+        where: { stockQty: { gt: 0 } },
+        data: { inStock: true },
+      });
+
+      const createdOrder = await tx.order.create({
+        data: {
+          orderNumber,
+          customerName: fullName,
+          customerEmail: email,
+          total,
+          status: "pending",
+          paymentStatus: "unpaid",
+          shippingAddress,
+          items: {
+            create: items.map((item: { id: string; name: string; qty: number; price: number }) => ({
+              name: item.name,
+              qty: item.qty,
+              price: item.price,
+              productId: item.id && validProductIds.has(item.id) ? item.id : undefined,
+            })),
+          },
+        },
+      });
+
+      await tx.customer.update({
+        where: { email },
+        data: {
+          totalOrders: { increment: 1 },
+          totalSpent: { increment: total },
+          lastOrderAt: new Date(),
+          name: fullName,
+          phone,
+        },
+      });
+
+      return createdOrder;
     });
 
     // --- Send order confirmation email (async, don't block response) ---
@@ -128,6 +175,12 @@ export async function POST(req: NextRequest) {
       generatedPassword,
     });
   } catch (error) {
+    if (error instanceof Error && error.message === "STOCK_CONFLICT") {
+      return NextResponse.json(
+        { error: "Stock changed while placing order. Please review cart quantities and try again." },
+        { status: 409 }
+      );
+    }
     console.error("Checkout error:", error);
     return NextResponse.json({ error: "Failed to place order" }, { status: 500 });
   }

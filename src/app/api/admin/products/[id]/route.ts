@@ -21,6 +21,7 @@ type UpdatePayload = {
   weight?: string | null;
   dimensions?: string | null;
   imageUrl?: string | null;
+  stockQty?: number;
   inStock?: boolean;
   badge?: string | null;
 };
@@ -58,6 +59,9 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: "Invalid category" }, { status: 400 });
     }
 
+    const parsedStockQty = Number(body.stockQty ?? 0);
+    const stockQty = Number.isFinite(parsedStockQty) ? Math.max(0, Math.trunc(parsedStockQty)) : 0;
+
     const updated = await prisma.product.update({
       where: { id },
       data: {
@@ -77,7 +81,8 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
         weight: body.weight ?? null,
         dimensions: body.dimensions ?? null,
         imageUrl: body.imageUrl?.trim() || null,
-        inStock: body.inStock ?? true,
+        stockQty,
+        inStock: stockQty > 0,
         gradient: category.gradient,
         icon: category.icon,
       },
@@ -103,13 +108,16 @@ export async function PATCH(req: NextRequest, { params }: RouteContext) {
     }
 
     const { id } = await params;
-    const body = (await req.json()) as { inStock?: boolean };
+    const body = (await req.json()) as { inStock?: boolean; stockQty?: number };
+    const hasBoolean = typeof body.inStock === "boolean";
+    const hasQty = typeof body.stockQty === "number" && Number.isFinite(body.stockQty);
 
-    if (typeof body.inStock !== "boolean") {
+    if (!hasBoolean && !hasQty) {
       return NextResponse.json({ error: "Invalid stock payload" }, { status: 400 });
     }
 
-    await prisma.product.update({ where: { id }, data: { inStock: body.inStock } });
+    const nextQty = hasQty ? Math.max(0, Math.trunc(body.stockQty as number)) : (body.inStock ? 1 : 0);
+    await prisma.product.update({ where: { id }, data: { stockQty: nextQty, inStock: nextQty > 0 } });
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Stock update error:", error);
