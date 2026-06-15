@@ -1,6 +1,7 @@
 import { readFile } from "fs/promises";
 import path from "path";
 import { NextRequest, NextResponse } from "next/server";
+import { getProductUploadsDir } from "@/lib/upload-path";
 
 type RouteContext = {
   params: Promise<{ filename: string }>;
@@ -23,6 +24,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
 
     // Try current runtime public dir first (works in Next standalone), then project public dir.
     const candidates = [
+      path.join(getProductUploadsDir(), safe),
       path.join(process.cwd(), "public", "uploads", "products", safe),
       path.join(process.cwd(), ".next", "standalone", "public", "uploads", "products", safe),
       path.join(process.cwd(), ".next", "public", "uploads", "products", safe),

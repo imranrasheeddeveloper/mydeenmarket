@@ -4,6 +4,7 @@ import path from "path";
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
 import { auth } from "@/lib/auth";
+import { getProductUploadsDir } from "@/lib/upload-path";
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
       .toBuffer();
 
     const fileName = `${Date.now()}-${randomUUID()}.jpg`;
-    const uploadsDir = path.join(process.cwd(), "public", "uploads", "products");
+    const uploadsDir = getProductUploadsDir();
     const targetPath = path.join(uploadsDir, fileName);
 
     await mkdir(uploadsDir, { recursive: true });
