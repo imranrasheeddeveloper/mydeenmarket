@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { heroImages } from "@/lib/stock-images";
 
 const slides = [
   {
@@ -12,6 +14,7 @@ const slides = [
       "Explore our curated collection of authentic Islamic books — from Quran translations to Hadith compilations.",
     cta: { text: "Shop Collection", href: "/collections" },
     arabicText: "بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ",
+    bgImage: heroImages[0],
   },
   {
     badge: "Best Seller",
@@ -20,6 +23,7 @@ const slides = [
       "Now available in premium edition. A timeless guide to prophetic healing methods.",
     cta: { text: "View Book", href: "/product/tib-e-nabvi-latest" },
     arabicText: "وَنُنَزِّلُ مِنَ ٱلْقُرْآنِ مَا هُوَ شِفَآءٌ",
+    bgImage: heroImages[1],
   },
   {
     badge: "Free Shipping",
@@ -28,6 +32,7 @@ const slides = [
       "Nurture young minds with beautiful Islamic stories and educational books for children.",
     cta: { text: "Explore", href: "/collections/children" },
     arabicText: "رَبِّ زِدْنِي عِلْمًا",
+    bgImage: heroImages[2],
   },
 ];
 
@@ -57,23 +62,48 @@ export default function HeroSlider() {
 
   return (
     <section
-      className="relative overflow-hidden bg-gradient-to-br from-[#0c1220] via-[#0f172a] to-[#1a1f3a]"
+      className="relative overflow-hidden bg-black"
       aria-label="Featured promotions"
     >
-      {/* ═══ Background Noor Effects (behind everything) ═══ */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        {/* Islamic geometric pattern */}
-        <div className="absolute inset-0 islamic-pattern opacity-[0.04]" />
+      {/* ═══ Slides Content (BEHIND noor effects) ═══ */}
+      <div className="absolute inset-0 z-0">
+        {slides.map((slide, i) => (
+          <div
+            key={i}
+            className={`absolute inset-0 transition-all duration-700 ease-in-out ${
+              i === current ? "opacity-100 visible" : "opacity-0 invisible"
+            }`}
+            style={{
+              backgroundImage: `url('${slide.bgImage.src}')`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+            aria-hidden={i !== current}
+          >
+            {/* Dark overlay for text readability */}
+            <div 
+              className="absolute inset-0" 
+              style={{ backgroundColor: slide.bgImage.overlayColor }}
+            />
+          </div>
+        ))}
+      </div>
 
-        {/* Noor breathing — central divine glow */}
-        <div className="noor-breathe w-[900px] h-[900px] top-1/2 left-[40%]" style={{ animationDuration: "10s" }} />
-        <div className="noor-glow w-[600px] h-[600px] top-[20%] right-[-100px]" style={{ animationDuration: "12s", animationDelay: "3s" }} />
+      {/* ═══ Background Noor Effects (MIDDLE layer) ═══ */}
+      <div className="absolute inset-0 z-5 pointer-events-none" aria-hidden="true">
+        {/* Islamic geometric pattern */}
+        <div className="absolute inset-0 islamic-pattern opacity-[0.08]" />
+
+        {/* Noor breathing — central divine glow with adjusted colors */}
+        <div className="noor-breathe w-[900px] h-[900px] top-1/2 left-[40%]" style={{ animationDuration: "10s", background: 'radial-gradient(circle, rgba(212,168,83,0.15) 0%, transparent 70%)' }} />
+        <div className="noor-glow w-[600px] h-[600px] top-[20%] right-[-100px]" style={{ animationDuration: "12s", animationDelay: "3s", background: 'radial-gradient(circle, rgba(13,148,136,0.12) 0%, transparent 70%)' }} />
 
         {/* Drifting noor orbs */}
-        <div className="noor-bubble w-[300px] h-[300px] top-[5%] right-[5%]" style={{ animationDelay: "0s", animationDuration: "14s" }} />
-        <div className="noor-bubble w-[200px] h-[200px] bottom-[15%] left-[8%]" style={{ animationDelay: "3s", animationDuration: "16s" }} />
-        <div className="noor-bubble-teal w-[250px] h-[250px] top-[10%] left-[50%]" style={{ animationDelay: "2s" }} />
-        <div className="noor-bubble-teal w-[180px] h-[180px] bottom-[20%] right-[15%]" style={{ animationDelay: "5s", animationDuration: "20s" }} />
+        <div className="noor-bubble w-[300px] h-[300px] top-[5%] right-[5%]" style={{ animationDelay: "0s", animationDuration: "14s", background: 'radial-gradient(circle, rgba(212,168,83,0.08) 0%, transparent 70%)' }} />
+        <div className="noor-bubble w-[200px] h-[200px] bottom-[15%] left-[8%]" style={{ animationDelay: "3s", animationDuration: "16s", background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)' }} />
+        <div className="noor-bubble-teal w-[250px] h-[250px] top-[10%] left-[50%]" style={{ animationDelay: "2s", background: 'radial-gradient(circle, rgba(13,148,136,0.1) 0%, transparent 70%)' }} />
+        <div className="noor-bubble-teal w-[180px] h-[180px] bottom-[20%] right-[15%]" style={{ animationDelay: "5s", animationDuration: "20s", background: 'radial-gradient(circle, rgba(212,168,83,0.07) 0%, transparent 70%)' }} />
 
         {/* Sparkle particles */}
         <div className="noor-sparkle top-[12%] left-[18%]" style={{ animationDelay: "0s" }} />
@@ -84,135 +114,115 @@ export default function HeroSlider() {
         <div className="noor-sparkle bottom-[35%] left-[65%]" style={{ animationDelay: "2.5s" }} />
 
         {/* Rotating geometric rings */}
-        <div className="noor-ring w-[500px] h-[500px] top-[5%] right-[-100px]" style={{ animationDuration: "50s" }} />
-        <div className="noor-ring w-[400px] h-[400px] bottom-[-80px] left-[-60px]" style={{ animationDuration: "40s", animationDirection: "reverse" }} />
+        <div className="noor-ring w-[500px] h-[500px] top-[5%] right-[-100px]" style={{ animationDuration: "50s", background: 'conic-gradient(from 0deg, rgba(212,168,83,0.1), transparent 50%)' }} />
+        <div className="noor-ring w-[400px] h-[400px] bottom-[-80px] left-[-60px]" style={{ animationDuration: "40s", animationDirection: "reverse", background: 'conic-gradient(from 0deg, transparent 50%, rgba(13,148,136,0.08))' }} />
       </div>
 
-      {/* ═══ Slides Content ═══ */}
-      <div className="relative z-10 min-h-[520px] sm:min-h-[560px] md:min-h-[600px] lg:min-h-[680px]">
-        {slides.map((slide, i) => (
-          <div
-            key={i}
-            className={`absolute inset-0 transition-all duration-700 ease-in-out ${
-              i === current ? "opacity-100 visible" : "opacity-0 invisible"
-            }`}
-            aria-hidden={i !== current}
-          >
-            <div className="h-full flex items-center">
-              <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 w-full">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                  {/* Left — Text Content */}
-                  <div
-                    className={`transition-all duration-700 delay-100 ${
-                      i === current
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 translate-y-6"
-                    }`}
-                  >
-                    {/* Arabic calligraphy */}
-                    <p
-                      className="text-[#d4a853] opacity-40 text-2xl md:text-3xl mb-6 font-[family-name:var(--font-playfair)]"
-                      dir="rtl"
-                      aria-hidden="true"
+      {/* ═══ Content Layer (FRONT) ═══ */}
+      <div className="relative z-10 min-h-[520px] sm:min-h-[560px] md:min-h-[600px] lg:min-h-[680px] flex items-center">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left — Text Content */}
+            <div
+              className={`transition-all duration-700 delay-100 ${
+                "opacity-100 translate-y-0"
+              }`}
+            >
+              {/* Arabic calligraphy */}
+              <p
+                className="text-[#d4a853] opacity-40 text-2xl md:text-3xl mb-6 font-[family-name:var(--font-playfair)]"
+                dir="rtl"
+                aria-hidden="true"
+              >
+                {slides[current].arabicText}
+              </p>
+
+              {/* Badge */}
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#d4a853]/15 border border-[#d4a853]/25 rounded-full text-[11px] font-semibold text-[#d4a853] tracking-widest uppercase mb-6">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#d4a853] animate-pulse" />
+                {slides[current].badge}
+              </span>
+
+              {/* Title */}
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.08] mb-6 font-[family-name:var(--font-playfair)] drop-shadow-lg">
+                {slides[current].title}
+              </h2>
+
+              {/* Description */}
+              <p className="text-slate-300 text-lg mb-10 max-w-lg leading-relaxed">
+                {slides[current].description}
+              </p>
+
+              {/* CTAs */}
+              <div className="flex items-center gap-5">
+                <Link
+                  href={slides[current].cta.href}
+                  className="group inline-flex items-center gap-2.5 px-8 py-4 bg-[#d4a853] text-[#0f172a] rounded-full font-semibold text-sm hover:bg-[#e8c97a] transition-all duration-300 hover:shadow-[0_8px_40px_rgba(212,168,83,0.3)]"
+                >
+                  {slides[current].cta.text}
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+                <Link
+                  href="/collections"
+                  className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
+                >
+                  Browse All →
+                </Link>
+              </div>
+            </div>
+
+            {/* Right — Decorative Panel */}
+            <div className="hidden lg:flex justify-center">
+              <div className="relative w-[320px] h-[420px]">
+                {/* Noor glow behind panel */}
+                <div
+                  className="absolute inset-0 bg-[#d4a853]/[0.06] rounded-[2rem] blur-[60px] animate-pulse"
+                  style={{ animationDuration: "6s" }}
+                />
+                {/* Outer border frames */}
+                <div className="absolute inset-0 rounded-[2rem] border border-[#d4a853]/10" />
+                <div className="absolute inset-3 rounded-[1.6rem] border border-[#d4a853]/[0.07]" />
+                {/* Inner content */}
+                <div className="absolute inset-6 rounded-[1.2rem] bg-white/[0.03] backdrop-blur-sm flex flex-col items-center justify-center">
+                  <div className="w-16 h-16 rounded-2xl bg-[#d4a853]/10 flex items-center justify-center mb-5 border border-[#d4a853]/15">
+                    <svg
+                      className="w-8 h-8 text-[#d4a853]/60"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      strokeWidth={1.5}
                     >
-                      {slide.arabicText}
-                    </p>
-
-                    {/* Badge */}
-                    <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#d4a853]/15 border border-[#d4a853]/25 rounded-full text-[11px] font-semibold text-[#d4a853] tracking-widest uppercase mb-6">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#d4a853] animate-pulse" />
-                      {slide.badge}
-                    </span>
-
-                    {/* Title */}
-                    <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.08] mb-6 font-[family-name:var(--font-playfair)] drop-shadow-lg">
-                      {slide.title}
-                    </h2>
-
-                    {/* Description */}
-                    <p className="text-slate-300 text-lg mb-10 max-w-lg leading-relaxed">
-                      {slide.description}
-                    </p>
-
-                    {/* CTAs */}
-                    <div className="flex items-center gap-5">
-                      <Link
-                        href={slide.cta.href}
-                        className="group inline-flex items-center gap-2.5 px-8 py-4 bg-[#d4a853] text-[#0f172a] rounded-full font-semibold text-sm hover:bg-[#e8c97a] transition-all duration-300 hover:shadow-[0_8px_40px_rgba(212,168,83,0.3)]"
-                      >
-                        {slide.cta.text}
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                      </Link>
-                      <Link
-                        href="/collections"
-                        className="text-sm font-medium text-slate-300 hover:text-white transition-colors"
-                      >
-                        Browse All →
-                      </Link>
-                    </div>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                      />
+                    </svg>
                   </div>
-
-                  {/* Right — Decorative Panel */}
-                  <div
-                    className={`hidden lg:flex justify-center transition-all duration-700 delay-200 ${
-                      i === current
-                        ? "opacity-100 translate-y-0"
-                        : "opacity-0 translate-y-8"
-                    }`}
+                  <p
+                    className="text-[#d4a853]/40 text-3xl font-[family-name:var(--font-playfair)] mb-3"
+                    dir="rtl"
+                    aria-hidden="true"
                   >
-                    <div className="relative w-[320px] h-[420px]">
-                      {/* Noor glow behind panel */}
-                      <div
-                        className="absolute inset-0 bg-[#d4a853]/[0.06] rounded-[2rem] blur-[60px] animate-pulse"
-                        style={{ animationDuration: "6s" }}
-                      />
-                      {/* Outer border frames */}
-                      <div className="absolute inset-0 rounded-[2rem] border border-[#d4a853]/10" />
-                      <div className="absolute inset-3 rounded-[1.6rem] border border-[#d4a853]/[0.07]" />
-                      {/* Inner content */}
-                      <div className="absolute inset-6 rounded-[1.2rem] bg-white/[0.03] backdrop-blur-sm flex flex-col items-center justify-center">
-                        <div className="w-16 h-16 rounded-2xl bg-[#d4a853]/10 flex items-center justify-center mb-5 border border-[#d4a853]/15">
-                          <svg
-                            className="w-8 h-8 text-[#d4a853]/60"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                            />
-                          </svg>
-                        </div>
-                        <p
-                          className="text-[#d4a853]/40 text-3xl font-[family-name:var(--font-playfair)] mb-3"
-                          dir="rtl"
-                          aria-hidden="true"
-                        >
-                          ﷽
-                        </p>
-                        <div className="w-16 h-px bg-gradient-to-r from-transparent via-[#d4a853]/25 to-transparent mb-3" />
-                        <p className="text-slate-400 text-xs tracking-[0.25em] uppercase">
-                          MyDeenMarket
-                        </p>
-                        <p className="text-slate-500 text-[10px] tracking-[0.15em] uppercase mt-1">
-                          Est. 2024
-                        </p>
-                      </div>
-                      {/* Glow accents */}
-                      <div
-                        className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-40 h-12 bg-[#d4a853]/[0.08] rounded-full blur-2xl animate-pulse"
-                        style={{ animationDuration: "5s" }}
-                      />
-                    </div>
-                  </div>
+                    ﷽
+                  </p>
+                  <div className="w-16 h-px bg-gradient-to-r from-transparent via-[#d4a853]/25 to-transparent mb-3" />
+                  <p className="text-slate-400 text-xs tracking-[0.25em] uppercase">
+                    MyDeenMarket
+                  </p>
+                  <p className="text-slate-500 text-[10px] tracking-[0.15em] uppercase mt-1">
+                    Est. 2024
+                  </p>
                 </div>
+                {/* Glow accents */}
+                <div
+                  className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-40 h-12 bg-[#d4a853]/[0.08] rounded-full blur-2xl animate-pulse"
+                  style={{ animationDuration: "5s" }}
+                />
               </div>
             </div>
           </div>
-        ))}
+        </div>
       </div>
 
       {/* ═══ Bottom gradient line ═══ */}

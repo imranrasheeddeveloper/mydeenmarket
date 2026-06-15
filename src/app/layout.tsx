@@ -154,6 +154,23 @@ export default async function RootLayout({
             __html: JSON.stringify(generateSiteNavigationSchema()),
           }}
         />
+        {/* Google Analytics */}
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-SGJTN3D6C8"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-SGJTN3D6C8', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
       </head>
       <body className="min-h-full flex flex-col antialiased">
         <AuthProvider>

@@ -1,0 +1,12 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="islamicPattern3" x="0" y="0" width="150" height="150" patternUnits="userSpaceOnUse">
+      <polygon points="75,30 120,55 105,110 45,110 30,55" fill="none" stroke="rgba(212,168,83,0.13)" strokeWidth="1"/>
+      <circle cx="75" cy="75" r="40" fill="none" stroke="rgba(212,168,83,0.1)" strokeWidth="1"/>
+      <circle cx="75" cy="75" r="25" fill="none" stroke="rgba(212,168,83,0.08)" strokeWidth="1"/>
+      <path d="M75,50 L95,75 L75,100 L55,75 Z" fill="rgba(212,168,83,0.06)"/>
+      <circle cx="75" cy="75" r="5" fill="rgba(212,168,83,0.12)"/>
+    </pattern>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#islamicPattern3)"/>
+</svg>

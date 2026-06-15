@@ -8,12 +8,12 @@ export default async function Footer() {
 
   return (
     <footer className="relative" role="contentinfo">
-      <div className="gradient-dark-rich text-slate-300 relative overflow-hidden">
+      <div className="gradient-dark-islamic text-slate-300 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0d5d4f 0%, #1a3d3a 50%, #0a4a42 100%)' }}>
         <div className="absolute inset-0 islamic-pattern-dark" />
         {/* Noor effects */}
-        <div className="noor-glow w-[400px] h-[400px] top-[-100px] right-[-50px]" />
-        <div className="noor-bubble w-[250px] h-[250px] bottom-[20%] left-[-40px]" style={{ animationDelay: '3s' }} />
-        <div className="noor-bubble-teal w-[200px] h-[200px] top-[40%] right-[5%]" style={{ animationDelay: '1s' }} />
+        <div className="noor-glow w-[400px] h-[400px] top-[-100px] right-[-50px]" style={{ background: 'radial-gradient(circle, rgba(212,168,83,0.08) 0%, transparent 70%)' }} />
+        <div className="noor-bubble w-[250px] h-[250px] bottom-[20%] left-[-40px]" style={{ animationDelay: '3s', background: 'radial-gradient(circle, rgba(13,148,136,0.08) 0%, transparent 70%)' }} />
+        <div className="noor-bubble-teal w-[200px] h-[200px] top-[40%] right-[5%]" style={{ animationDelay: '1s', background: 'radial-gradient(circle, rgba(212,168,83,0.06) 0%, transparent 70%)' }} />
         <div className="noor-sparkle top-[15%] left-[25%]" style={{ animationDelay: '1s' }} />
         <div className="noor-sparkle bottom-[30%] right-[20%]" style={{ animationDelay: '2.5s' }} />
         
@@ -123,6 +123,7 @@ export default async function Footer() {
             </h4>
             <ul className="space-y-2.5">
               <li><Link href="/about" className="text-sm text-slate-400 hover:text-[#d4a853] transition-colors">About Us</Link></li>
+              <li><Link href="/faq" className="text-sm text-slate-400 hover:text-[#d4a853] transition-colors">FAQ</Link></li>
               <li><Link href="/policies/shipping" className="text-sm text-slate-400 hover:text-[#d4a853] transition-colors">Shipment and Refund Policy</Link></li>
               <li><Link href="/policies/terms" className="text-sm text-slate-400 hover:text-[#d4a853] transition-colors">Terms &amp; Services</Link></li>
               <li><Link href="/policies/privacy" className="text-sm text-slate-400 hover:text-[#d4a853] transition-colors">Privacy and Cookies Policy</Link></li>
@@ -146,7 +147,7 @@ export default async function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-[#d4a853]/10 bg-gradient-to-r from-[#080c15] via-[#0a1018] to-[#080c15]">
+      <div className="border-t border-[#d4a853]/10" style={{ background: 'linear-gradient(90deg, #0a3a35 0%, #0d4a42 50%, #0a3a35 100%)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 relative z-10">
           <p className="text-xs text-slate-500">
             © {new Date().getFullYear()} MyDeenMarket. All rights reserved.
