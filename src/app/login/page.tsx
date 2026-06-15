@@ -125,7 +125,7 @@ export default function LoginPage() {
           </p>
 
           <div className="mt-4 p-3 bg-amber-50 rounded-lg text-xs text-amber-700">
-            <strong>Demo admin:</strong> admin@mydeenmarket.com / admin123
+            Admin login — contact support for access.
           </div>
         </div>
       </div>
