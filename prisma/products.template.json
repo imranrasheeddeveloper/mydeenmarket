@@ -1,0 +1,28 @@
+[
+  {
+    "slug": "your-product-slug-1",
+    "name": "Your Product Name",
+    "nameUrdu": "",
+    "author": "Author Name",
+    "vendor": "Your Brand",
+    "price": 2500,
+    "compareAtPrice": 3000,
+    "rating": 5,
+    "reviewCount": 0,
+    "categorySlug": "quran",
+    "badge": "new",
+    "description": "Detailed product description.",
+    "features": [
+      "Feature one",
+      "Feature two"
+    ],
+    "language": "English",
+    "pages": 320,
+    "isbn": "",
+    "weight": "500g",
+    "dimensions": "14 x 21 cm",
+    "inStock": true,
+    "gradient": "from-emerald-200 to-emerald-400",
+    "icon": "book"
+  }
+]
