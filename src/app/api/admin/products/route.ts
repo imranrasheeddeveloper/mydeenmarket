@@ -17,6 +17,7 @@ type CreatePayload = {
   weight?: string | null;
   dimensions?: string | null;
   imageUrl?: string | null;
+  images?: string[];
   stockQty?: number;
   inStock?: boolean;
   badge?: string | null;
@@ -93,6 +94,7 @@ export async function POST(req: NextRequest) {
         weight: body.weight ?? null,
         dimensions: body.dimensions ?? null,
         imageUrl: body.imageUrl?.trim() || null,
+        images: JSON.stringify((body.images || []).filter(Boolean)),
         stockQty,
         inStock: stockQty > 0,
         gradient: category.gradient,

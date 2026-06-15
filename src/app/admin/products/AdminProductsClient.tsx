@@ -10,6 +10,7 @@ type ProductForm = {
   id?: string;
   name: string;
   imageUrl: string;
+  images: string[];
   stockQty: string;
   author: string;
   vendor: string;
@@ -30,6 +31,7 @@ const EMPTY_FORM: ProductForm = {
   id: undefined,
   name: "",
   imageUrl: "",
+  images: [],
   stockQty: "0",
   author: "",
   vendor: "",
@@ -98,6 +100,7 @@ export default function AdminProductsClient({
       id: product.id,
       name: product.name,
       imageUrl: product.imageUrl || "",
+      images: product.images || [],
       stockQty: String(product.stockQty ?? 0),
       author: product.author,
       vendor: product.vendor,
@@ -139,7 +142,11 @@ export default function AdminProductsClient({
         return;
       }
 
-      setForm((prev) => ({ ...prev, imageUrl: data.url || "" }));
+      setForm((prev) => ({
+        ...prev,
+        imageUrl: data.url || "",
+        images: [...prev.images, data.url || ""].filter(Boolean),
+      }));
     } catch {
       setErrorMsg("Image upload request failed.");
     } finally {
@@ -165,7 +172,8 @@ export default function AdminProductsClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
-          imageUrl: form.imageUrl || null,
+          imageUrl: form.images[0] || form.imageUrl || null,
+          images: form.images.length > 0 ? form.images : (form.imageUrl ? [form.imageUrl] : []),
           stockQty: Number(form.stockQty || "0"),
           author: form.author,
           vendor: form.vendor,
@@ -431,33 +439,52 @@ export default function AdminProductsClient({
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Product Photo (Upload & Compress)</label>
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Product Photos</label>
+                  {/* Thumbnail grid */}
+                  {form.images.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {form.images.map((url, idx) => (
+                        <div key={url + idx} className="relative group">
+                          <img src={url} alt={`Image ${idx + 1}`} className="w-20 h-24 rounded-lg object-cover border-2 border-gray-100" />
+                          {idx === 0 && (
+                            <span className="absolute top-1 left-1 bg-emerald-600 text-white text-[9px] px-1 rounded">Main</span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setForm((prev) => ({
+                              ...prev,
+                              images: prev.images.filter((_, i) => i !== idx),
+                              imageUrl: prev.images.filter((_, i) => i !== idx)[0] || "",
+                            }))}
+                            className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {/* Upload button */}
+                  <label className="inline-flex items-center gap-2 px-4 py-2.5 border border-dashed border-gray-300 rounded-lg text-sm text-gray-600 hover:border-emerald-500 hover:text-emerald-700 cursor-pointer transition-colors">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                    {uploadingImage ? "Uploading..." : form.images.length === 0 ? "Add photos" : "Add more photos"}
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          void handleImageUpload(file);
+                      multiple
+                      className="hidden"
+                      onChange={async (e) => {
+                        const files = Array.from(e.target.files || []);
+                        for (const file of files) {
+                          await handleImageUpload(file);
                         }
+                        e.target.value = "";
                       }}
-                      className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
                     />
-                    {uploadingImage ? <span className="text-xs text-gray-500 self-center">Uploading...</span> : null}
-                  </div>
-                  {form.imageUrl ? (
-                    <div className="mt-3 flex items-center gap-3">
-                      <img src={form.imageUrl} alt="Preview" className="w-16 h-20 rounded-md object-cover border border-gray-100" />
-                      <button
-                        type="button"
-                        onClick={() => setForm((prev) => ({ ...prev, imageUrl: "" }))}
-                        className="text-xs text-red-600 hover:text-red-700"
-                      >
-                        Remove image
-                      </button>
-                    </div>
-                  ) : null}
+                  </label>
+                  <p className="mt-1 text-xs text-gray-400">First image is the main listing photo. Drag to reorder coming soon.</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Brand / Author</label>

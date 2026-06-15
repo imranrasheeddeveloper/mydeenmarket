@@ -58,6 +58,7 @@ function mapProduct(row: {
   weight: string | null;
   dimensions: string | null;
   imageUrl: string | null;
+  images: string;
   stockQty: number;
   inStock: boolean;
   gradient: string;
@@ -66,6 +67,7 @@ function mapProduct(row: {
   return {
     ...row,
     features: JSON.parse(row.features),
+    images: (() => { try { return JSON.parse(row.images); } catch { return []; } })(),
   };
 }
 

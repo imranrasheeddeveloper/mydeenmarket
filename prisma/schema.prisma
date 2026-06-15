@@ -62,6 +62,7 @@ model Product {
   weight         String?
   dimensions     String?
   imageUrl       String?
+  images         String  @default("[]")
   stockQty       Int         @default(0)
   inStock        Boolean     @default(true)
   gradient       String
