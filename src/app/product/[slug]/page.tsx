@@ -5,6 +5,8 @@ import ProductCard from "@/components/ProductCard";
 import ProductReviews from "@/components/ProductReviews";
 import { getProductBySlug, getProductsByCategory, getProductReviews, formatPrice } from "@/lib/data";
 import { generatePageMetadata, generateProductSchema, generateBreadcrumbSchema } from "@/lib/seo";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import AddToCartButton from "./AddToCartButton";
 
 type Params = Promise<{ slug: string }>;
@@ -36,8 +38,23 @@ export default async function ProductPage({ params }: { params: Params }) {
     notFound();
   }
 
-  const categoryProducts = await getProductsByCategory(product.categorySlug);
-  const productReviews = await getProductReviews(product.id);
+  const session = await auth();
+  const [categoryProducts, productReviews] = await Promise.all([
+    getProductsByCategory(product.categorySlug),
+    getProductReviews(product.id),
+  ]);
+  const isLoggedIn = Boolean(session?.user?.email);
+  const canReview = isLoggedIn
+    ? Boolean(
+        await prisma.orderItem.findFirst({
+          where: {
+            productId: product.id,
+            order: { customerEmail: session!.user!.email! },
+          },
+          select: { id: true },
+        })
+      )
+    : false;
   const related = categoryProducts
     .filter((p) => p.id !== product.id)
     .slice(0, 4);
@@ -273,7 +290,12 @@ export default async function ProductPage({ params }: { params: Params }) {
           </div>
         </div>
 
-        <ProductReviews productId={product.id} initialReviews={productReviews} />
+        <ProductReviews
+          productId={product.id}
+          initialReviews={productReviews}
+          canReview={canReview}
+          isLoggedIn={isLoggedIn}
+        />
 
         {/* Related Products */}
         {related.length > 0 && (

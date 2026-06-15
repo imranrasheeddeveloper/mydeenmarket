@@ -81,6 +81,10 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     const session = await auth();
     const body = (await req.json()) as CreateReviewPayload;
 
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Please log in to submit a review" }, { status: 401 });
+    }
+
     const product = await prisma.product.findUnique({
       where: { id: productId },
       select: { id: true },
@@ -90,10 +94,27 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    const customerName = (body.customerName || session?.user?.name || "").trim();
-    const customerEmail = (body.customerEmail || session?.user?.email || "").trim();
+    const customerName = (session.user.name || body.customerName || "").trim();
+    const customerEmail = session.user.email.trim();
     const comment = (body.comment || "").trim();
     const rating = Number(body.rating);
+
+    const purchased = await prisma.orderItem.findFirst({
+      where: {
+        productId,
+        order: {
+          customerEmail,
+        },
+      },
+      select: { id: true },
+    });
+
+    if (!purchased) {
+      return NextResponse.json(
+        { error: "Only customers who purchased this product can review it" },
+        { status: 403 }
+      );
+    }
 
     if (!customerName || comment.length < 10 || !Number.isFinite(rating)) {
       return NextResponse.json(

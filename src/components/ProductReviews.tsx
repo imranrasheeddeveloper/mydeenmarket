@@ -15,6 +15,8 @@ type ProductReview = {
 type ProductReviewsProps = {
   productId: string;
   initialReviews: ProductReview[];
+  canReview: boolean;
+  isLoggedIn: boolean;
 };
 
 function formatDate(iso: string) {
@@ -43,7 +45,7 @@ function Stars({ rating }: { rating: number }) {
   );
 }
 
-export default function ProductReviews({ productId, initialReviews }: ProductReviewsProps) {
+export default function ProductReviews({ productId, initialReviews, canReview, isLoggedIn }: ProductReviewsProps) {
   const [reviews, setReviews] = useState<ProductReview[]>(initialReviews);
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -144,7 +146,17 @@ export default function ProductReviews({ productId, initialReviews }: ProductRev
         <div className="rounded-2xl border border-gray-100 bg-gray-50 p-5 h-fit">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Write a Review</h3>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {!isLoggedIn ? (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              Please log in and purchase this product to write a review.
+            </div>
+          ) : !canReview ? (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+              Review is available only for customers who purchased this product.
+            </div>
+          ) : null}
+
+          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
               <input
@@ -152,6 +164,7 @@ export default function ProductReviews({ productId, initialReviews }: ProductRev
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 required
+                disabled={!canReview || !isLoggedIn}
                 className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-emerald-600"
                 placeholder="Enter your name"
               />
@@ -163,6 +176,7 @@ export default function ProductReviews({ productId, initialReviews }: ProductRev
                 type="email"
                 value={customerEmail}
                 onChange={(e) => setCustomerEmail(e.target.value)}
+                disabled={!canReview || !isLoggedIn}
                 className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-emerald-600"
                 placeholder="you@example.com"
               />
@@ -173,6 +187,7 @@ export default function ProductReviews({ productId, initialReviews }: ProductRev
               <select
                 value={rating}
                 onChange={(e) => setRating(Number(e.target.value))}
+                disabled={!canReview || !isLoggedIn}
                 className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-emerald-600"
               >
                 <option value={5}>5 - Excellent</option>
@@ -191,6 +206,7 @@ export default function ProductReviews({ productId, initialReviews }: ProductRev
                 rows={5}
                 required
                 minLength={10}
+                disabled={!canReview || !isLoggedIn}
                 className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-emerald-600"
                 placeholder="Share your experience with this product"
               />
@@ -201,7 +217,7 @@ export default function ProductReviews({ productId, initialReviews }: ProductRev
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !canReview || !isLoggedIn}
               className="w-full inline-flex items-center justify-center rounded-lg bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white text-sm font-medium py-2.5 transition-colors"
             >
               {loading ? "Submitting..." : "Submit Review"}
