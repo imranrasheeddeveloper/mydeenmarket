@@ -57,6 +57,7 @@ function mapProduct(row: {
   isbn: string | null;
   weight: string | null;
   dimensions: string | null;
+  imageUrl: string | null;
   inStock: boolean;
   gradient: string;
   icon: string;

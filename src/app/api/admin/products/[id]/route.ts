@@ -20,6 +20,7 @@ type UpdatePayload = {
   isbn?: string | null;
   weight?: string | null;
   dimensions?: string | null;
+  imageUrl?: string | null;
   inStock?: boolean;
   badge?: string | null;
 };
@@ -75,6 +76,7 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
         isbn: body.isbn ?? null,
         weight: body.weight ?? null,
         dimensions: body.dimensions ?? null,
+        imageUrl: body.imageUrl?.trim() || null,
         inStock: body.inStock ?? true,
         gradient: category.gradient,
         icon: category.icon,

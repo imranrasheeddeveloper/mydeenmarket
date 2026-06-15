@@ -8,6 +8,7 @@ import { formatPrice } from "@/lib/data-types";
 type ProductForm = {
   id?: string;
   name: string;
+  imageUrl: string;
   author: string;
   vendor: string;
   categorySlug: string;
@@ -27,6 +28,7 @@ type ProductForm = {
 const EMPTY_FORM: ProductForm = {
   id: undefined,
   name: "",
+  imageUrl: "",
   author: "",
   vendor: "",
   categorySlug: "",
@@ -93,6 +95,7 @@ export default function AdminProductsClient({
     setForm({
       id: product.id,
       name: product.name,
+      imageUrl: product.imageUrl || "",
       author: product.author,
       vendor: product.vendor,
       categorySlug: product.categorySlug,
@@ -130,6 +133,7 @@ export default function AdminProductsClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
+          imageUrl: form.imageUrl || null,
           author: form.author,
           vendor: form.vendor,
           categorySlug: form.categorySlug,
@@ -283,11 +287,19 @@ export default function AdminProductsClient({
                 <tr key={product.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-12 rounded-md bg-gradient-to-br ${product.gradient} flex items-center justify-center shrink-0`}>
-                        <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                        </svg>
-                      </div>
+                      {product.imageUrl ? (
+                        <img
+                          src={product.imageUrl}
+                          alt={product.name}
+                          className="w-10 h-12 rounded-md object-cover shrink-0 border border-gray-100"
+                        />
+                      ) : (
+                        <div className={`w-10 h-12 rounded-md bg-gradient-to-br ${product.gradient} flex items-center justify-center shrink-0`}>
+                          <svg className="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                          </svg>
+                        </div>
+                      )}
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate max-w-[200px]">{product.name}</p>
                         <p className="text-xs text-gray-500 truncate max-w-[200px]">{product.author}</p>
@@ -384,6 +396,16 @@ export default function AdminProductsClient({
                     onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
                     placeholder="e.g. Premium Abaya, Digital Tasbih, Zamzam Water"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Photo URL</label>
+                  <input
+                    type="url"
+                    value={form.imageUrl}
+                    onChange={(e) => setForm((prev) => ({ ...prev, imageUrl: e.target.value }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600"
+                    placeholder="https://example.com/product-image.jpg"
                   />
                 </div>
                 <div>

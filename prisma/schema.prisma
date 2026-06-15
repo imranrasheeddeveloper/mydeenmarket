@@ -61,6 +61,7 @@ model Product {
   isbn           String?
   weight         String?
   dimensions     String?
+  imageUrl       String?
   inStock        Boolean     @default(true)
   gradient       String
   icon           String

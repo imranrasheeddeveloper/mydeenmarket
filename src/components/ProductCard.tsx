@@ -60,12 +60,20 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <article className="group bg-white rounded-2xl overflow-hidden border border-slate-100 hover:border-slate-200 hover:shadow-2xl hover:shadow-slate-200/40 transition-all duration-500 flex flex-col">
       <Link href={`/product/${product.slug}`} className="relative block aspect-[4/5] overflow-hidden">
-        <div className={`w-full h-full bg-gradient-to-br ${product.gradient} flex flex-col items-center justify-center gap-3 p-6 group-hover:scale-[1.05] transition-transform duration-700 ease-out`}>
-          {iconMap[product.icon] || iconMap.book}
-          <span className="text-sm font-medium text-white/70 text-center leading-tight">
-            {product.name.length > 30 ? product.name.substring(0, 30) + "..." : product.name}
-          </span>
-        </div>
+        {product.imageUrl ? (
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
+          />
+        ) : (
+          <div className={`w-full h-full bg-gradient-to-br ${product.gradient} flex flex-col items-center justify-center gap-3 p-6 group-hover:scale-[1.05] transition-transform duration-700 ease-out`}>
+            {iconMap[product.icon] || iconMap.book}
+            <span className="text-sm font-medium text-white/70 text-center leading-tight">
+              {product.name.length > 30 ? product.name.substring(0, 30) + "..." : product.name}
+            </span>
+          </div>
+        )}
         {product.badge && (
           <span className={`absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider ${badgeStyles[product.badge]}`}>
             {badgeLabels[product.badge]}
