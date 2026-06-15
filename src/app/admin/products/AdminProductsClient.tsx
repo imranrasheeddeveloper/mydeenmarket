@@ -6,6 +6,7 @@ import type { Category, Product } from "@/lib/data-types";
 import { formatPrice } from "@/lib/data-types";
 
 type ProductForm = {
+  id?: string;
   name: string;
   author: string;
   vendor: string;
@@ -18,11 +19,13 @@ type ProductForm = {
   weight: string;
   dimensions: string;
   badge: string;
+  inStock: boolean;
   description: string;
   featuresText: string;
 };
 
 const EMPTY_FORM: ProductForm = {
+  id: undefined,
   name: "",
   author: "",
   vendor: "",
@@ -35,6 +38,7 @@ const EMPTY_FORM: ProductForm = {
   weight: "",
   dimensions: "",
   badge: "",
+  inStock: true,
   description: "",
   featuresText: "",
 };
@@ -49,10 +53,13 @@ export default function AdminProductsClient({
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
+
+  const isEditMode = Boolean(form.id);
 
   const filtered = allProducts.filter(
     (p) => {
@@ -61,7 +68,11 @@ export default function AdminProductsClient({
       p.author.toLowerCase().includes(search.toLowerCase()) ||
       p.category.toLowerCase().includes(search.toLowerCase());
       const matchesCategory = !categoryFilter || p.categorySlug === categoryFilter;
-      return matchesText && matchesCategory;
+      const matchesStatus =
+        !statusFilter ||
+        (statusFilter === "instock" && p.inStock) ||
+        (statusFilter === "outofstock" && !p.inStock);
+      return matchesText && matchesCategory && matchesStatus;
     }
   );
 
@@ -78,7 +89,30 @@ export default function AdminProductsClient({
     setShowAddModal(false);
   };
 
-  const handleAddProduct = async () => {
+  const openEditModal = (product: Product) => {
+    setForm({
+      id: product.id,
+      name: product.name,
+      author: product.author,
+      vendor: product.vendor,
+      categorySlug: product.categorySlug,
+      price: String(product.price),
+      compareAtPrice: product.compareAtPrice ? String(product.compareAtPrice) : "",
+      language: product.language || "",
+      pages: product.pages ? String(product.pages) : "",
+      isbn: product.isbn || "",
+      weight: product.weight || "",
+      dimensions: product.dimensions || "",
+      badge: product.badge || "",
+      inStock: product.inStock,
+      description: product.description,
+      featuresText: product.features.join("\n"),
+    });
+    setErrorMsg("");
+    setShowAddModal(true);
+  };
+
+  const handleSaveProduct = async () => {
     if (!form.name || !form.categorySlug || !form.description || !form.price) {
       setErrorMsg("Please fill all required fields.");
       return;
@@ -88,8 +122,11 @@ export default function AdminProductsClient({
     setErrorMsg("");
 
     try {
-      const response = await fetch("/api/admin/products", {
-        method: "POST",
+      const endpoint = isEditMode ? `/api/admin/products/${form.id}` : "/api/admin/products";
+      const method = isEditMode ? "PUT" : "POST";
+
+      const response = await fetch(endpoint, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
@@ -104,6 +141,7 @@ export default function AdminProductsClient({
           weight: form.weight || null,
           dimensions: form.dimensions || null,
           badge: form.badge || null,
+          inStock: form.inStock,
           description: form.description,
           features: form.featuresText
             .split("\n")
@@ -114,7 +152,7 @@ export default function AdminProductsClient({
 
       const payload = await response.json();
       if (!response.ok) {
-        setErrorMsg(payload.error || "Failed to create product.");
+        setErrorMsg(payload.error || "Failed to save product.");
         setSubmitting(false);
         return;
       }
@@ -124,6 +162,49 @@ export default function AdminProductsClient({
     } catch {
       setErrorMsg("Request failed. Please try again.");
       setSubmitting(false);
+    }
+  };
+
+  const handleDeleteProduct = async (productId: string) => {
+    const confirmed = window.confirm("Delete this product? This action cannot be undone.");
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(`/api/admin/products/${productId}`, {
+        method: "DELETE",
+      });
+
+      const payload = await response.json();
+      if (!response.ok) {
+        window.alert(payload.error || "Failed to delete product.");
+        return;
+      }
+
+      router.refresh();
+    } catch {
+      window.alert("Request failed. Please try again.");
+    }
+  };
+
+  const handleToggleStock = async (productId: string, nextInStock: boolean) => {
+    try {
+      const response = await fetch(`/api/admin/products/${productId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          inStock: nextInStock,
+        }),
+      });
+
+      const payload = await response.json();
+      if (!response.ok) {
+        window.alert(payload.error || "Failed to update stock status.");
+        return;
+      }
+
+      router.refresh();
+    } catch {
+      window.alert("Request failed. Please try again.");
     }
   };
 
@@ -173,7 +254,11 @@ export default function AdminProductsClient({
             </option>
           ))}
         </select>
-        <select className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600">
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600"
+        >
           <option value="">All Status</option>
           <option value="instock">In Stock</option>
           <option value="outofstock">Out of Stock</option>
@@ -226,14 +311,20 @@ export default function AdminProductsClient({
                   <td className="px-5 py-4 hidden sm:table-cell">
                     <div className="flex items-center gap-2">
                       {product.inStock ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full text-xs font-medium">
+                        <button
+                          onClick={() => handleToggleStock(product.id, false)}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium transition-colors"
+                        >
                           <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
                           In Stock
-                        </span>
+                        </button>
                       ) : (
-                        <span className="px-2 py-0.5 bg-red-50 text-red-700 rounded-full text-xs font-medium">
+                        <button
+                          onClick={() => handleToggleStock(product.id, true)}
+                          className="px-2 py-0.5 bg-red-50 hover:bg-red-100 text-red-700 rounded-full text-xs font-medium transition-colors"
+                        >
                           Out of Stock
-                        </span>
+                        </button>
                       )}
                       {product.badge && (
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badgeStyles[product.badge]}`}>
@@ -244,12 +335,20 @@ export default function AdminProductsClient({
                   </td>
                   <td className="px-5 py-4 text-right">
                     <div className="flex items-center justify-end gap-1">
-                      <button className="p-2 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors" title="Edit">
+                      <button
+                        onClick={() => openEditModal(product)}
+                        className="p-2 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                        title="Edit"
+                      >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </button>
-                      <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                      <button
+                        onClick={() => handleDeleteProduct(product.id)}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete"
+                      >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
@@ -268,7 +367,7 @@ export default function AdminProductsClient({
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-              <h2 className="text-lg font-bold text-gray-900">Add New Product</h2>
+              <h2 className="text-lg font-bold text-gray-900">{isEditMode ? "Edit Product" : "Add New Product"}</h2>
               <button onClick={resetModal} className="p-2 text-gray-500 hover:text-gray-700" aria-label="Close">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -405,6 +504,17 @@ export default function AdminProductsClient({
                     <option value="sale">Sale</option>
                   </select>
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Stock Status</label>
+                  <select
+                    value={form.inStock ? "instock" : "outofstock"}
+                    onChange={(e) => setForm((prev) => ({ ...prev, inStock: e.target.value === "instock" }))}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:border-emerald-600"
+                  >
+                    <option value="instock">In Stock</option>
+                    <option value="outofstock">Out of Stock</option>
+                  </select>
+                </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Description *</label>
                   <textarea
@@ -439,11 +549,11 @@ export default function AdminProductsClient({
                   Cancel
                 </button>
                 <button
-                  onClick={handleAddProduct}
+                  onClick={handleSaveProduct}
                   disabled={submitting}
                   className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-60 text-white rounded-xl text-sm font-medium transition-colors"
                 >
-                  {submitting ? "Adding..." : "Add Product"}
+                  {submitting ? (isEditMode ? "Saving..." : "Adding...") : (isEditMode ? "Save Changes" : "Add Product")}
                 </button>
               </div>
             </div>
