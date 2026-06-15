@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import ProductCard from "@/components/ProductCard";
 import ProductReviews from "@/components/ProductReviews";
 import { getProductBySlug, getProductsByCategory, getProductReviews, formatPrice } from "@/lib/data";
@@ -198,9 +200,20 @@ export default async function ProductPage({ params }: { params: Params }) {
             </div>
 
             {/* Description */}
-            <p className="text-gray-600 leading-relaxed mb-6" itemProp="description">
-              {product.description}
-            </p>
+            <div className="text-gray-600 leading-relaxed mb-6" itemProp="description">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  p: ({ children }) => <p className="mb-3 last:mb-0">{children}</p>,
+                  ul: ({ children }) => <ul className="list-disc pl-5 space-y-1 mb-3">{children}</ul>,
+                  ol: ({ children }) => <ol className="list-decimal pl-5 space-y-1 mb-3">{children}</ol>,
+                  li: ({ children }) => <li>{children}</li>,
+                  strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+                }}
+              >
+                {product.description}
+              </ReactMarkdown>
+            </div>
 
             {/* Features */}
             <div className="mb-6">

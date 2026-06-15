@@ -588,14 +588,15 @@ export default function AdminProductsClient({
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Description *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Description * (supports bold + bullet points)</label>
                   <textarea
                     rows={4}
                     value={form.description}
                     onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-emerald-600 resize-none"
-                    placeholder="Product description..."
+                    placeholder={"Use markdown, e.g.\n**Premium Qurani Qaida**\n- Easy lessons\n- Large text\n- For beginners"}
                   />
+                  <p className="mt-1 text-xs text-gray-500">Tip: use **text** for bold and lines starting with - for bullet points.</p>
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Features (one per line)</label>

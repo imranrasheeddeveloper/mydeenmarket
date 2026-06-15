@@ -7,6 +7,15 @@ type RouteContext = {
   params: Promise<{ filename: string }>;
 };
 
+function getContentType(filename: string): string {
+  const ext = path.extname(filename).toLowerCase();
+  if (ext === ".png") return "image/png";
+  if (ext === ".webp") return "image/webp";
+  if (ext === ".gif") return "image/gif";
+  if (ext === ".svg") return "image/svg+xml";
+  return "image/jpeg";
+}
+
 function safeFilename(input: string): string | null {
   const decoded = decodeURIComponent(input);
   if (!/^[a-zA-Z0-9._-]+$/.test(decoded)) return null;
@@ -36,7 +45,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
         return new NextResponse(file, {
           status: 200,
           headers: {
-            "Content-Type": "image/jpeg",
+            "Content-Type": getContentType(safe),
             "Cache-Control": "public, max-age=31536000, immutable",
           },
         });

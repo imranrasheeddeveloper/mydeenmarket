@@ -62,6 +62,7 @@ export default function Header({
   const popularSearches = ["Quran", "Hadith", "Sealed Nectar", "Tib e Nabvi", "Kids Books", "Prayer Guide"];
   const trendingCategories = [
     { name: "Holy Quran", slug: "quran", icon: "📖" },
+    { name: "Qaida / Nazra", slug: "qaida-nazra", icon: "📘" },
     { name: "Hadith", slug: "hadith", icon: "📚" },
     { name: "Seerah", slug: "seerah", icon: "🌙" },
     { name: "Kids / Children", slug: "children", icon: "🧒" },

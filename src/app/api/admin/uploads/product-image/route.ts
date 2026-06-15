@@ -6,6 +6,9 @@ import sharp from "sharp";
 import { auth } from "@/lib/auth";
 import { getProductUploadsDir } from "@/lib/upload-path";
 
+const MAX_WIDTH = 1400;
+const MAX_HEIGHT = 1400;
+
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
@@ -31,14 +34,14 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const inputBuffer = Buffer.from(arrayBuffer);
 
-    // Resize and compress to an optimized JPEG suitable for product cards/detail pages.
+    // Normalize and compress all incoming formats (png/webp/jpeg/etc.) into efficient WebP.
     const optimizedBuffer = await sharp(inputBuffer)
       .rotate()
-      .resize({ width: 1400, height: 1400, fit: "inside", withoutEnlargement: true })
-      .jpeg({ quality: 78, mozjpeg: true })
+      .resize({ width: MAX_WIDTH, height: MAX_HEIGHT, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 80 })
       .toBuffer();
 
-    const fileName = `${Date.now()}-${randomUUID()}.jpg`;
+    const fileName = `${Date.now()}-${randomUUID()}.webp`;
     const uploadsDir = getProductUploadsDir();
     const targetPath = path.join(uploadsDir, fileName);
 

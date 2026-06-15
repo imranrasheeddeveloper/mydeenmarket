@@ -47,7 +47,8 @@ async function main() {
 
   // ─── Categories ───
   const categoriesData = [
-    { name: "Quran", slug: "quran", count: 120, icon: "book-quran", gradient: "from-emerald-900 to-emerald-600", description: "Explore our extensive collection of Quran translations, Tafseer, Tajweed guides, and Qurani Qaidah for all ages." },
+    { name: "Quran", slug: "quran", count: 120, icon: "book-quran", gradient: "from-emerald-900 to-emerald-600", description: "Explore our extensive collection of Quran translations, Tafseer, and Tajweed guides." },
+    { name: "Qaida / Nazra", slug: "qaida-nazra", count: 40, icon: "book", gradient: "from-emerald-800 to-cyan-600", description: "Noorani Qaida, Qurani Qaida, and Nazra learning books for beginners and kids." },
     { name: "Hadith", slug: "hadith", count: 85, icon: "book-open", gradient: "from-sky-900 to-sky-600", description: "Authentic Hadith collections including Sahih Bukhari, Sahih Muslim, and other renowned compilations." },
     { name: "Prayer / Supplication", slug: "prayer", count: 60, icon: "hands-praying", gradient: "from-purple-900 to-purple-600", description: "Books on Salah, Duas, Fortress of the Muslim, and guides to perfecting your prayer and supplications." },
     { name: "Prophet's Seerah", slug: "seerah", count: 45, icon: "star-and-crescent", gradient: "from-amber-900 to-amber-600", description: "The life and biography of Prophet Muhammad ﷺ — from The Sealed Nectar to comprehensive Seerah collections." },
@@ -69,7 +70,7 @@ async function main() {
       create: cat,
     });
   }
-  console.log("  ✅ Categories (12)");
+  console.log("  ✅ Categories (13)");
 
   // ─── Collections ───
   const collectionsData = [
