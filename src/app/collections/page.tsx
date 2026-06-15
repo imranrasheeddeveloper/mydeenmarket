@@ -4,6 +4,8 @@ import ProductCard from "@/components/ProductCard";
 import { getProducts, getCategories } from "@/lib/data";
 import { generatePageMetadata, generateBreadcrumbSchema } from "@/lib/seo";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = generatePageMetadata({
   title: "All Collections — Islamic Books & Products",
   description:

@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
-import { getProductBySlug, getProductsByCategory, getAllProductSlugs, formatPrice } from "@/lib/data";
+import { getProductBySlug, getProductsByCategory, formatPrice } from "@/lib/data";
 import { generatePageMetadata, generateProductSchema, generateBreadcrumbSchema } from "@/lib/seo";
 import AddToCartButton from "./AddToCartButton";
 
 type Params = Promise<{ slug: string }>;
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;
@@ -23,11 +25,6 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     description: `${product.description.substring(0, 100)} Authentic · Fast Delivery · COD available at MyDeenMarket.`,
     path: `/product/${slug}`,
   });
-}
-
-export async function generateStaticParams() {
-  const slugs = await getAllProductSlugs();
-  return slugs.map((slug) => ({ slug }));
 }
 
 export default async function ProductPage({ params }: { params: Params }) {

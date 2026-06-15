@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [products, categories, collections] = await Promise.all([
     getProducts(), getCategories(), getCollections(),

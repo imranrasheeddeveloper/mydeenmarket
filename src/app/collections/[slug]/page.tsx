@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
-import { getCategoryBySlug, getProductsByCategory, getCategories, getAllCategorySlugs } from "@/lib/data";
+import { getCategoryBySlug, getProductsByCategory, getCategories } from "@/lib/data";
 import { generatePageMetadata, generateBreadcrumbSchema, generateCollectionSchema } from "@/lib/seo";
 
 type Params = Promise<{ slug: string }>;
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;
@@ -22,11 +24,6 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     description: `${descBase} Shop authentic ${category.name.toLowerCase()} at MyDeenMarket. Free shipping over Rs. 5,000.`,
     path: `/collections/${slug}`,
   });
-}
-
-export async function generateStaticParams() {
-  const slugs = await getAllCategorySlugs();
-  return slugs.map((slug) => ({ slug }));
 }
 
 export default async function CollectionPage({ params }: { params: Params }) {
