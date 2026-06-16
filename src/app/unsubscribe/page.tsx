@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 type UiState = "loading" | "success" | "error";
 
-export default function UnsubscribePage() {
+function UnsubscribeContent() {
   const params = useSearchParams();
   const token = params.get("token") || "";
   const [state, setState] = useState<UiState>("loading");
@@ -56,5 +56,22 @@ export default function UnsubscribePage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function UnsubscribePage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-[60vh] bg-slate-50 py-16 px-4">
+          <div className="max-w-xl mx-auto bg-white border border-slate-200 rounded-2xl p-8 text-center">
+            <h1 className="text-2xl font-bold text-slate-900 mb-3">Email Preferences</h1>
+            <p className="text-sm text-slate-600">Loading...</p>
+          </div>
+        </main>
+      }
+    >
+      <UnsubscribeContent />
+    </Suspense>
   );
 }
