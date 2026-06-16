@@ -156,7 +156,7 @@ export default function AdminNewsletterPage() {
         <div>
           <h2 className="text-lg font-bold text-gray-900">Send Campaign</h2>
           <p className="text-sm text-gray-500 mt-1">
-            Sends promotional email only to users with status subscribed. Include <span className="font-mono">{{"{{unsubscribe_url}}"}}</span> in HTML where you want the unsubscribe link.
+            Sends promotional email only to users with status subscribed. Include <span className="font-mono">{"{{unsubscribe_url}}"}</span> in HTML where you want the unsubscribe link.
           </p>
         </div>
 
