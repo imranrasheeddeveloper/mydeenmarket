@@ -147,4 +147,11 @@ model SiteConfig {
   whatsappNumber        String @default("+923035036392")
   whatsappPhoneId       String @default("")
   whatsappToken         String @default("")
+  enableMetaTracking    Boolean @default(false)
+  metaPixelId           String  @default("")
+  metaCapiToken         String  @default("")
+  enableGoogleTracking  Boolean @default(false)
+  ga4Id                 String  @default("")
+  googleAdsConversionId String  @default("")
+  googleAdsLabel        String  @default("")
 }

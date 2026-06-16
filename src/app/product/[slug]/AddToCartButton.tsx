@@ -3,6 +3,7 @@
 import type { Product } from "@/lib/data-types";
 import { formatPrice } from "@/lib/data-types";
 import { useState } from "react";
+import { trackAddToCart } from "@/lib/tracking-client";
 
 export default function AddToCartButton({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
@@ -20,6 +21,14 @@ export default function AddToCartButton({ product }: { product: Product }) {
       localStorage.setItem("cart", JSON.stringify(cart));
       window.dispatchEvent(new Event("cart-updated"));
       window.dispatchEvent(new Event("toggle-cart"));
+
+      trackAddToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        qty,
+      });
+
       setAdded(true);
       setTimeout(() => setAdded(false), 2000);
     } catch { /* ignore */ }

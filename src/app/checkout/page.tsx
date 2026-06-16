@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { formatPrice, siteConfig } from "@/lib/data-types";
+import { trackPurchase } from "@/lib/tracking-client";
 
 interface CartItem {
   id: string;
@@ -76,6 +77,12 @@ export default function CheckoutPage() {
 
       setOrderNumber(data.orderNumber);
       setGeneratedPassword(data.generatedPassword || "");
+
+      trackPurchase({
+        orderNumber: data.orderNumber,
+        total,
+        items,
+      });
 
       // Auto sign-in the user
       if (data.generatedPassword) {

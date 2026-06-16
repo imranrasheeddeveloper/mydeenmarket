@@ -11,6 +11,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import AddToCartButton from "./AddToCartButton";
 import ProductImageGallery from "@/components/ProductImageGallery";
+import ProductViewTracker from "@/components/ProductViewTracker";
 
 type Params = Promise<{ slug: string }>;
 
@@ -80,6 +81,12 @@ export default async function ProductPage({ params }: { params: Params }) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+      <ProductViewTracker
+        id={product.id}
+        name={product.name}
+        price={product.price}
+        category={product.category}
       />
 
       {/* Breadcrumb */}

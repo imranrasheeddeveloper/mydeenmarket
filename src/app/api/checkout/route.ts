@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendOrderConfirmation } from "@/lib/email";
 import { sendWhatsAppOrderNotification } from "@/lib/whatsapp";
+import { sendMetaPurchaseEvent } from "@/lib/meta-capi";
 import bcrypt from "bcryptjs";
 
 export async function POST(req: NextRequest) {
@@ -182,6 +183,21 @@ export async function POST(req: NextRequest) {
         qty: item.qty,
         price: item.price,
       })),
+    }).catch(() => {});
+
+    // --- Send Meta Conversion API purchase event (async, don't block response) ---
+    const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "mydeenmarket.com";
+    const proto = req.headers.get("x-forwarded-proto") || "https";
+    sendMetaPurchaseEvent({
+      orderNumber: order.orderNumber,
+      total,
+      email,
+      phone,
+      items: items.map((item: { id?: string; qty: number }) => ({
+        id: item.id,
+        qty: item.qty,
+      })),
+      sourceUrl: `${proto}://${host}/checkout`,
     }).catch(() => {});
 
     return NextResponse.json({

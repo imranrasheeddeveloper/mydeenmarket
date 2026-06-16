@@ -24,6 +24,13 @@ interface Settings {
   whatsappNumber: string;
   whatsappPhoneId: string;
   whatsappToken: string;
+  enableMetaTracking: boolean;
+  metaPixelId: string;
+  metaCapiToken: string;
+  enableGoogleTracking: boolean;
+  ga4Id: string;
+  googleAdsConversionId: string;
+  googleAdsLabel: string;
 }
 
 const defaults: Settings = {
@@ -32,6 +39,8 @@ const defaults: Settings = {
   socialFacebook: "", socialInstagram: "", socialYoutube: "",
   smtpHost: "", smtpPort: 587, smtpUser: "", smtpPass: "", smtpFrom: "", smtpSecure: false,
   whatsappNumber: "+923035036392", whatsappPhoneId: "", whatsappToken: "",
+  enableMetaTracking: false, metaPixelId: "", metaCapiToken: "",
+  enableGoogleTracking: false, ga4Id: "", googleAdsConversionId: "", googleAdsLabel: "",
 };
 
 export default function AdminSettingsPage() {
@@ -313,6 +322,97 @@ export default function AdminSettingsPage() {
           </a>{" "}
           → Create App → Add WhatsApp product → copy <em>Phone Number ID</em> and <em>Access Token</em> from API Setup.
           New orders will automatically be sent to your WhatsApp number once configured.
+        </div>
+      </div>
+
+      {/* Ads Tracking */}
+      <div className="bg-white rounded-xl border border-gray-100 p-6">
+        <h2 className="font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 19V6m0 0L7 10m4-4l4 4M5 19h14" />
+          </svg>
+          Ads Tracking (Meta + Google)
+        </h2>
+        <p className="text-sm text-gray-500 mb-5">
+          Configure tracking IDs and toggles to send PageView, ViewContent, AddToCart, and Purchase events.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+          <div className="sm:col-span-2">
+            <label className="flex items-center gap-2.5">
+              <input
+                type="checkbox"
+                checked={form.enableMetaTracking}
+                onChange={(e) => update("enableMetaTracking", e.target.checked)}
+                className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+              />
+              <span className="text-sm text-gray-700">Enable Meta tracking</span>
+            </label>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Meta Pixel ID</label>
+            <input
+              type="text"
+              value={form.metaPixelId}
+              onChange={(e) => update("metaPixelId", e.target.value)}
+              placeholder="123456789012345"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Meta CAPI Token</label>
+            <input
+              type="password"
+              value={form.metaCapiToken}
+              onChange={(e) => update("metaCapiToken", e.target.value)}
+              placeholder="EAAB..."
+              className={inputCls}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="sm:col-span-2">
+            <label className="flex items-center gap-2.5">
+              <input
+                type="checkbox"
+                checked={form.enableGoogleTracking}
+                onChange={(e) => update("enableGoogleTracking", e.target.checked)}
+                className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500"
+              />
+              <span className="text-sm text-gray-700">Enable Google tracking</span>
+            </label>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">GA4 Measurement ID</label>
+            <input
+              type="text"
+              value={form.ga4Id}
+              onChange={(e) => update("ga4Id", e.target.value)}
+              placeholder="G-XXXXXXXXXX"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Google Ads Conversion ID</label>
+            <input
+              type="text"
+              value={form.googleAdsConversionId}
+              onChange={(e) => update("googleAdsConversionId", e.target.value)}
+              placeholder="AW-123456789"
+              className={inputCls}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Google Ads Conversion Label</label>
+            <input
+              type="text"
+              value={form.googleAdsLabel}
+              onChange={(e) => update("googleAdsLabel", e.target.value)}
+              placeholder="AbCdEFghIJKLmNoP"
+              className={inputCls}
+            />
+          </div>
         </div>
       </div>
 

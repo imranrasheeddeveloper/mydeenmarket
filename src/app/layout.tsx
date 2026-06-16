@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
@@ -7,6 +8,7 @@ import CartDrawer from "@/components/CartDrawer";
 import AuthProvider from "@/components/AuthProvider";
 import { CurrencyProvider } from "@/components/CurrencyProvider";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import TrackingPageView from "@/components/TrackingPageView";
 import { siteConfig } from "@/lib/data-types";
 import { getCategories, getSearchableProducts } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
@@ -129,12 +131,34 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [categories, searchableProducts, whatsappConfig] = await Promise.all([
+  const [categories, searchableProducts, config] = await Promise.all([
     getCategories(),
     getSearchableProducts(),
-    prisma.siteConfig.findFirst({ select: { whatsappNumber: true } }),
+    prisma.siteConfig.findFirst({
+      select: {
+        whatsappNumber: true,
+        enableMetaTracking: true,
+        metaPixelId: true,
+        enableGoogleTracking: true,
+        ga4Id: true,
+        googleAdsConversionId: true,
+        googleAdsLabel: true,
+      },
+    }),
   ]);
-  const whatsappNumber = whatsappConfig?.whatsappNumber || "+923035036392";
+  const whatsappNumber = config?.whatsappNumber || "+923035036392";
+  const enableMetaTracking = Boolean(config?.enableMetaTracking && config.metaPixelId);
+  const enableGoogleTracking = Boolean(
+    config?.enableGoogleTracking && (config.ga4Id || config.googleAdsConversionId)
+  );
+  const ga4Id = config?.ga4Id || "";
+  const googleAdsConversionId = config?.googleAdsConversionId || "";
+  const googleAdsLabel = config?.googleAdsLabel || "";
+  const gtagLoadId = ga4Id || googleAdsConversionId;
+
+  const normalizedAdsId = googleAdsConversionId
+    ? (googleAdsConversionId.startsWith("AW-") ? googleAdsConversionId : `AW-${googleAdsConversionId}`)
+    : "";
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} h-full`}>
       <head>
@@ -161,27 +185,49 @@ export default async function RootLayout({
             __html: JSON.stringify(generateSiteNavigationSchema()),
           }}
         />
-        {/* Google Analytics */}
-        <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-SGJTN3D6C8"
-        />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-SGJTN3D6C8', {
-                page_path: window.location.pathname,
-              });
-            `,
-          }}
-        />
+        {enableMetaTracking ? (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+                n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+                t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}
+                (window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
+                fbq('init', '${config?.metaPixelId}');
+                fbq('track', 'PageView');
+              `,
+            }}
+          />
+        ) : null}
+
+        {enableGoogleTracking && gtagLoadId ? (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${gtagLoadId}`} />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  window.gtag = function(){window.dataLayer.push(arguments);};
+                  window.__mdmTracking = {
+                    googleAdsConversionId: '${googleAdsConversionId || ""}',
+                    googleAdsLabel: '${googleAdsLabel || ""}',
+                  };
+                  gtag('js', new Date());
+                  ${ga4Id ? `gtag('config', '${ga4Id}');` : ""}
+                  ${normalizedAdsId ? `gtag('config', '${normalizedAdsId}');` : ""}
+                `,
+              }}
+            />
+          </>
+        ) : null}
       </head>
       <body className="min-h-full flex flex-col antialiased">
         <AuthProvider>
           <CurrencyProvider>
+            <Suspense fallback={null}>
+              <TrackingPageView />
+            </Suspense>
             <a href="#main-content" className="skip-link">
               Skip to content
             </a>

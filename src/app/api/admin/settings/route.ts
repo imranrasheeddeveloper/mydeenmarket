@@ -37,6 +37,13 @@ export async function GET() {
       whatsappNumber: config.whatsappNumber,
       whatsappPhoneId: config.whatsappPhoneId,
       whatsappToken: config.whatsappToken,
+      enableMetaTracking: config.enableMetaTracking,
+      metaPixelId: config.metaPixelId,
+      metaCapiToken: config.metaCapiToken,
+      enableGoogleTracking: config.enableGoogleTracking,
+      ga4Id: config.ga4Id,
+      googleAdsConversionId: config.googleAdsConversionId,
+      googleAdsLabel: config.googleAdsLabel,
     });
   } catch (error) {
     console.error("Settings fetch error:", error);
@@ -77,6 +84,13 @@ export async function PUT(req: NextRequest) {
         whatsappNumber: body.whatsappNumber || "+923035036392",
         whatsappPhoneId: body.whatsappPhoneId || "",
         whatsappToken: body.whatsappToken || "",
+        enableMetaTracking: Boolean(body.enableMetaTracking),
+        metaPixelId: body.metaPixelId || "",
+        metaCapiToken: body.metaCapiToken || "",
+        enableGoogleTracking: Boolean(body.enableGoogleTracking),
+        ga4Id: body.ga4Id || "",
+        googleAdsConversionId: body.googleAdsConversionId || "",
+        googleAdsLabel: body.googleAdsLabel || "",
       },
       create: {
         id: "main",
@@ -101,6 +115,13 @@ export async function PUT(req: NextRequest) {
         whatsappNumber: body.whatsappNumber || "+923035036392",
         whatsappPhoneId: body.whatsappPhoneId || "",
         whatsappToken: body.whatsappToken || "",
+        enableMetaTracking: Boolean(body.enableMetaTracking),
+        metaPixelId: body.metaPixelId || "",
+        metaCapiToken: body.metaCapiToken || "",
+        enableGoogleTracking: Boolean(body.enableGoogleTracking),
+        ga4Id: body.ga4Id || "",
+        googleAdsConversionId: body.googleAdsConversionId || "",
+        googleAdsLabel: body.googleAdsLabel || "",
       },
     });
 
