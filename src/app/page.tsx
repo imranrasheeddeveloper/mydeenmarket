@@ -26,6 +26,19 @@ export default async function HomePage() {
 
   const bestSellers = products.filter((p) => p.badge === "bestseller");
   
+  // Top rated products (sorted by rating)
+  const topRated = [...products]
+    .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+    .slice(0, 8);
+
+  // Most reviewed products
+  const mostReviewed = [...products]
+    .sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0))
+    .slice(0, 8);
+
+  // New bestsellers (products that are both new and bestseller)
+  const newBestsellers = products.filter((p) => p.badge === "bestseller").slice(0, 4);
+  
   // Category-specific best sellers
   const categoryBestSellers = {
     quran: products.filter((p) => p.category === "quran" && p.badge === "bestseller").slice(0, 4),
@@ -543,6 +556,54 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Top Rated Products */}
+      <section className="py-20 md:py-28 bg-white" aria-labelledby="top-rated-heading">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
+          <AnimateOnScroll animation="fade-up">
+            <div className="flex items-end justify-between mb-12">
+              <div>
+                <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Customer Favorites</p>
+                <h2 id="top-rated-heading" className="text-3xl sm:text-4xl font-bold text-slate-900 font-[family-name:var(--font-playfair)]">Top Rated Products</h2>
+              </div>
+              <Link href="/collections" className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white hover:border-slate-300 transition-all group">
+                View All Products <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+          </AnimateOnScroll>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {topRated.map((product, i) => (
+              <AnimateOnScroll key={product.id} delay={i * 50} animation="fade-up">
+                <ProductCard product={product} />
+              </AnimateOnScroll>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Most Reviewed Products */}
+      <section className="py-20 md:py-28 bg-[#f8f7f4]" aria-labelledby="most-reviewed-heading">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
+          <AnimateOnScroll animation="fade-up">
+            <div className="flex items-end justify-between mb-12">
+              <div>
+                <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Customer Reviews</p>
+                <h2 id="most-reviewed-heading" className="text-3xl sm:text-4xl font-bold text-slate-900 font-[family-name:var(--font-playfair)]">Most Reviewed Books</h2>
+              </div>
+              <Link href="/collections" className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white hover:border-slate-300 transition-all group">
+                View All Products <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+          </AnimateOnScroll>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {mostReviewed.map((product, i) => (
+              <AnimateOnScroll key={product.id} delay={i * 50} animation="fade-up">
+                <ProductCard product={product} />
+              </AnimateOnScroll>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Quranic Verse */}
       <section className="py-24 md:py-32 gradient-dark-rich relative overflow-hidden" aria-label="Quranic inspiration">
