@@ -7,7 +7,7 @@ CREATE TABLE "User" (
     "image" TEXT,
     "role" TEXT NOT NULL DEFAULT 'customer',
     "provider" TEXT NOT NULL DEFAULT 'credentials',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateTable
@@ -55,7 +55,7 @@ CREATE TABLE "Product" (
     "inStock" BOOLEAN NOT NULL DEFAULT true,
     "gradient" TEXT NOT NULL,
     "icon" TEXT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "Product_categorySlug_fkey" FOREIGN KEY ("categorySlug") REFERENCES "Category" ("slug") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -67,8 +67,8 @@ CREATE TABLE "Customer" (
     "phone" TEXT,
     "totalOrders" INTEGER NOT NULL DEFAULT 0,
     "totalSpent" INTEGER NOT NULL DEFAULT 0,
-    "joinedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "lastOrderAt" DATETIME
+    "joinedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "lastOrderAt" TIMESTAMP
 );
 
 -- CreateTable
@@ -81,7 +81,7 @@ CREATE TABLE "Order" (
     "status" TEXT NOT NULL DEFAULT 'pending',
     "paymentStatus" TEXT NOT NULL DEFAULT 'unpaid',
     "shippingAddress" TEXT NOT NULL,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "Order_customerEmail_fkey" FOREIGN KEY ("customerEmail") REFERENCES "Customer" ("email") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
