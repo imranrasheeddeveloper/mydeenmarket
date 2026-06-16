@@ -14,6 +14,7 @@ A modern, full-stack e-commerce platform for authentic Islamic books and product
 - [Programmatic SEO — How It Works](#programmatic-seo--how-it-works)
 - [Getting Started](#getting-started)
 - [Database Commands](#database-commands)
+- [Backups](#backups)
 - [Deployment](#deployment)
 
 ---
@@ -303,6 +304,43 @@ docker-compose up --build
 | `npm run db:seed` | Seed database with sample products |
 | `npm run db:reset` | Reset database (destructive) |
 | `npm run db:studio` | Open Prisma Studio GUI |
+
+---
+
+## Backups
+
+This project includes a one-command production backup that copies both:
+
+- PostgreSQL production data (SQL dump)
+- Product image uploads folder
+
+### Create local backup from production
+
+```bash
+npm run backup:prod
+```
+
+- Prompts for SSH password once
+- Stores backup under `backups/production/<timestamp>/`
+- Updates `backups/production/latest` symlink
+
+### Restore local DB + images from backup
+
+```bash
+npm run restore:local
+```
+
+You can restore from a specific snapshot:
+
+```bash
+./scripts/restore-local-from-backup.sh ./backups/production/20260616-193000
+```
+
+Configurable environment variables for scripts:
+
+- `REMOTE_HOST`, `REMOTE_USER`, `REMOTE_APP_DIR`, `REMOTE_IMAGE_DIR`
+- `BACKUP_ROOT`
+- `LOCAL_DATABASE_URL`, `LOCAL_IMAGE_DIR`
 
 ---
 

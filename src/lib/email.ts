@@ -6,6 +6,7 @@ interface EmailOptions {
   to: string;
   subject: string;
   html: string;
+  listUnsubscribeUrl?: string;
 }
 
 async function getSmtpConfig() {
@@ -37,11 +38,18 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       auth: { user: smtp.user, pass: smtp.pass },
     });
 
+    const headers: Record<string, string> = {};
+    if (options.listUnsubscribeUrl) {
+      headers["List-Unsubscribe"] = `<${options.listUnsubscribeUrl}>`;
+      headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
+    }
+
     await transporter.sendMail({
       from: `"${smtp.storeName}" <${smtp.from}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,
+      headers,
     });
 
     return true;

@@ -155,3 +155,15 @@ model SiteConfig {
   googleAdsConversionId String  @default("")
   googleAdsLabel        String  @default("")
 }
+
+model NewsletterSubscriber {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  status          String   @default("subscribed")
+  unsubscribeToken String  @unique
+  source          String   @default("homepage")
+  subscribedAt    DateTime @default(now())
+  unsubscribedAt  DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

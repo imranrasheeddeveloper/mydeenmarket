@@ -3,6 +3,7 @@ import HeroSlider from "@/components/HeroSlider";
 import ProductCard from "@/components/ProductCard";
 import AnimateOnScroll from "@/components/AnimateOnScroll";
 import StatsCounter from "@/components/StatsCounter";
+import NewsletterSignup from "@/components/NewsletterSignup";
 import { getProducts, getCategories, getCollections } from "@/lib/data";
 import { generateBreadcrumbSchema, generateFAQSchema, generateItemListSchema } from "@/lib/seo";
 import {
@@ -385,10 +386,7 @@ export default async function HomePage() {
             </div>
             <h2 id="newsletter-heading" className="text-3xl sm:text-4xl font-bold text-white mb-4 font-[family-name:var(--font-playfair)]">Stay Updated</h2>
             <p className="text-slate-400 mb-10 text-sm leading-relaxed">Get notified about new arrivals, exclusive offers, and Islamic content.</p>
-            <form className="flex flex-col sm:flex-row gap-3">
-              <input type="email" placeholder="Enter your email" className="flex-1 px-5 py-4 rounded-full text-sm bg-white/[0.06] border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-[#d4a853]/30 focus:bg-white/[0.08] transition-all" aria-label="Email address" required />
-              <button type="submit" className="px-8 py-4 bg-[#d4a853] text-[#0f172a] rounded-full font-semibold text-sm hover:bg-[#e8c97a] transition-all hover:shadow-[0_4px_20px_rgba(212,168,83,0.3)]">Subscribe</button>
-            </form>
+            <NewsletterSignup />
           </div>
         </AnimateOnScroll>
       </section>
