@@ -11,9 +11,9 @@ export function getProductUploadsDir(): string {
 
   const cwd = process.cwd();
 
-  // In standalone runtime, cwd is usually .next/standalone. Move back to project root.
+  // In standalone runtime, cwd is .next/standalone. Images are stored there directly.
   if (isStandaloneCwd(cwd)) {
-    return path.resolve(cwd, "..", "..", "uploads", "products");
+    return path.resolve(cwd, "uploads", "products");
   }
 
   // Local development/runtime fallback.
