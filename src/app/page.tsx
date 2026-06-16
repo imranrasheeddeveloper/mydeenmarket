@@ -33,6 +33,12 @@ export default async function HomePage() {
     prayer: products.filter((p) => p.category === "prayer" && p.badge === "bestseller").slice(0, 4),
     fiqh: products.filter((p) => p.category === "fiqh" && p.badge === "bestseller").slice(0, 4),
     seerah: products.filter((p) => p.category === "seerah" && p.badge === "bestseller").slice(0, 4),
+    biography: products.filter((p) => p.category === "biography" && p.badge === "bestseller").slice(0, 4),
+    aqeedah: products.filter((p) => p.category === "aqeedah" && p.badge === "bestseller").slice(0, 4),
+    history: products.filter((p) => p.category === "history" && p.badge === "bestseller").slice(0, 4),
+    dawah: products.filter((p) => p.category === "dawah" && p.badge === "bestseller").slice(0, 4),
+    "hajj-umrah": products.filter((p) => p.category === "hajj-umrah" && p.badge === "bestseller").slice(0, 4),
+    health: products.filter((p) => p.category === "health" && p.badge === "bestseller").slice(0, 4),
     children: products.filter((p) => p.category === "children" && p.badge === "bestseller").slice(0, 4),
   };
   const itemListSchema = generateItemListSchema(products.slice(0, 10));
@@ -373,6 +379,162 @@ export default async function HomePage() {
             </AnimateOnScroll>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
               {categoryBestSellers.children.map((product, i) => (
+                <AnimateOnScroll key={product.id} delay={i * 50} animation="fade-up">
+                  <ProductCard product={product} />
+                </AnimateOnScroll>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Biography Best Sellers */}
+      {categoryBestSellers.biography.length > 0 && (
+        <section className="py-20 md:py-28 bg-white" aria-labelledby="biography-bestsellers-heading">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8">
+            <AnimateOnScroll animation="fade-up">
+              <div className="flex items-end justify-between mb-12">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Life Stories</p>
+                  <h2 id="biography-bestsellers-heading" className="text-3xl sm:text-4xl font-bold text-slate-900 font-[family-name:var(--font-playfair)]">Best Selling Biography Books</h2>
+                </div>
+                <Link href="/collections/biography" className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white hover:border-slate-300 transition-all group">
+                  View All Biography Books <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+            </AnimateOnScroll>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {categoryBestSellers.biography.map((product, i) => (
+                <AnimateOnScroll key={product.id} delay={i * 50} animation="fade-up">
+                  <ProductCard product={product} />
+                </AnimateOnScroll>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Aqeedah Best Sellers */}
+      {categoryBestSellers.aqeedah.length > 0 && (
+        <section className="py-20 md:py-28 bg-[#f8f7f4]" aria-labelledby="aqeedah-bestsellers-heading">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8">
+            <AnimateOnScroll animation="fade-up">
+              <div className="flex items-end justify-between mb-12">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Islamic Beliefs</p>
+                  <h2 id="aqeedah-bestsellers-heading" className="text-3xl sm:text-4xl font-bold text-slate-900 font-[family-name:var(--font-playfair)]">Best Selling Aqeedah Books</h2>
+                </div>
+                <Link href="/collections/aqeedah" className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white hover:border-slate-300 transition-all group">
+                  View All Aqeedah Books <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+            </AnimateOnScroll>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {categoryBestSellers.aqeedah.map((product, i) => (
+                <AnimateOnScroll key={product.id} delay={i * 50} animation="fade-up">
+                  <ProductCard product={product} />
+                </AnimateOnScroll>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* History Best Sellers */}
+      {categoryBestSellers.history.length > 0 && (
+        <section className="py-20 md:py-28 bg-white" aria-labelledby="history-bestsellers-heading">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8">
+            <AnimateOnScroll animation="fade-up">
+              <div className="flex items-end justify-between mb-12">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Islamic Heritage</p>
+                  <h2 id="history-bestsellers-heading" className="text-3xl sm:text-4xl font-bold text-slate-900 font-[family-name:var(--font-playfair)]">Best Selling History Books</h2>
+                </div>
+                <Link href="/collections/history" className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white hover:border-slate-300 transition-all group">
+                  View All History Books <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+            </AnimateOnScroll>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {categoryBestSellers.history.map((product, i) => (
+                <AnimateOnScroll key={product.id} delay={i * 50} animation="fade-up">
+                  <ProductCard product={product} />
+                </AnimateOnScroll>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Dawah Best Sellers */}
+      {categoryBestSellers.dawah.length > 0 && (
+        <section className="py-20 md:py-28 bg-[#f8f7f4]" aria-labelledby="dawah-bestsellers-heading">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8">
+            <AnimateOnScroll animation="fade-up">
+              <div className="flex items-end justify-between mb-12">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Call to Islam</p>
+                  <h2 id="dawah-bestsellers-heading" className="text-3xl sm:text-4xl font-bold text-slate-900 font-[family-name:var(--font-playfair)]">Best Selling Dawah Books</h2>
+                </div>
+                <Link href="/collections/dawah" className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white hover:border-slate-300 transition-all group">
+                  View All Dawah Books <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+            </AnimateOnScroll>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {categoryBestSellers.dawah.map((product, i) => (
+                <AnimateOnScroll key={product.id} delay={i * 50} animation="fade-up">
+                  <ProductCard product={product} />
+                </AnimateOnScroll>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Hajj & Umrah Best Sellers */}
+      {categoryBestSellers["hajj-umrah"].length > 0 && (
+        <section className="py-20 md:py-28 bg-white" aria-labelledby="hajj-umrah-bestsellers-heading">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8">
+            <AnimateOnScroll animation="fade-up">
+              <div className="flex items-end justify-between mb-12">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Sacred Journey</p>
+                  <h2 id="hajj-umrah-bestsellers-heading" className="text-3xl sm:text-4xl font-bold text-slate-900 font-[family-name:var(--font-playfair)]">Best Selling Hajj & Umrah Books</h2>
+                </div>
+                <Link href="/collections/hajj-umrah" className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white hover:border-slate-300 transition-all group">
+                  View All Hajj & Umrah Books <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+            </AnimateOnScroll>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {categoryBestSellers["hajj-umrah"].map((product, i) => (
+                <AnimateOnScroll key={product.id} delay={i * 50} animation="fade-up">
+                  <ProductCard product={product} />
+                </AnimateOnScroll>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Health Best Sellers */}
+      {categoryBestSellers.health.length > 0 && (
+        <section className="py-20 md:py-28 bg-[#f8f7f4]" aria-labelledby="health-bestsellers-heading">
+          <div className="max-w-7xl mx-auto px-6 sm:px-8">
+            <AnimateOnScroll animation="fade-up">
+              <div className="flex items-end justify-between mb-12">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Wellness</p>
+                  <h2 id="health-bestsellers-heading" className="text-3xl sm:text-4xl font-bold text-slate-900 font-[family-name:var(--font-playfair)]">Best Selling Health Books</h2>
+                </div>
+                <Link href="/collections/health" className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white hover:border-slate-300 transition-all group">
+                  View All Health Books <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
+            </AnimateOnScroll>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {categoryBestSellers.health.map((product, i) => (
                 <AnimateOnScroll key={product.id} delay={i * 50} animation="fade-up">
                   <ProductCard product={product} />
                 </AnimateOnScroll>
