@@ -14,7 +14,10 @@
     "db:reset": "npx prisma migrate reset --force",
     "db:studio": "npx prisma studio",
     "backup:prod": "./scripts/backup-prod-to-local.sh",
-    "restore:local": "./scripts/restore-local-from-backup.sh"
+    "restore:local": "./scripts/restore-local-from-backup.sh",
+    "db:scrape:darussalam": "tsx prisma/scrape-darussalam.ts",
+    "db:scrape:darussalam:import": "tsx prisma/scrape-darussalam.ts --import",
+    "db:download:images": "tsx prisma/download-product-images.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

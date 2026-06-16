@@ -20,20 +20,20 @@ async function ensureReviewsTable() {
   if (reviewTableReady) return;
 
   await prisma.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS ProductReview (
+    CREATE TABLE IF NOT EXISTS "ProductReview" (
       id TEXT PRIMARY KEY,
-      productId TEXT NOT NULL,
-      customerName TEXT NOT NULL,
-      customerEmail TEXT,
+      "productId" TEXT NOT NULL,
+      "customerName" TEXT NOT NULL,
+      "customerEmail" TEXT,
       rating INTEGER NOT NULL,
       comment TEXT NOT NULL,
-      createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (productId) REFERENCES Product(id) ON DELETE CASCADE
+      "createdAt" TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      FOREIGN KEY ("productId") REFERENCES "Product"(id) ON DELETE CASCADE
     )
   `);
 
   await prisma.$executeRawUnsafe(
-    `CREATE INDEX IF NOT EXISTS ProductReview_productId_createdAt_idx ON ProductReview (productId, createdAt DESC)`
+    `CREATE INDEX IF NOT EXISTS "ProductReview_productId_createdAt_idx" ON "ProductReview" ("productId", "createdAt" DESC)`
   );
 
   reviewTableReady = true;
@@ -55,10 +55,10 @@ export async function GET(_req: NextRequest, { params }: RouteContext) {
         createdAt: string;
       }>
     >(
-      `SELECT id, productId, customerName, customerEmail, rating, comment, createdAt
-       FROM ProductReview
-       WHERE productId = ?
-       ORDER BY datetime(createdAt) DESC
+      `SELECT id, "productId", "customerName", "customerEmail", rating, comment, "createdAt"
+       FROM "ProductReview"
+       WHERE "productId" = $1
+       ORDER BY "createdAt" DESC
        LIMIT 50`,
       productId
     );
@@ -130,8 +130,8 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     await ensureReviewsTable();
 
     await prisma.$executeRawUnsafe(
-      `INSERT INTO ProductReview (id, productId, customerName, customerEmail, rating, comment)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO "ProductReview" (id, "productId", "customerName", "customerEmail", rating, comment)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
       randomUUID(),
       productId,
       customerName,
@@ -141,9 +141,9 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
     );
 
     const summary = await prisma.$queryRawUnsafe<Array<{ reviewCount: number; avgRating: number | null }>>(
-      `SELECT COUNT(*) AS reviewCount, AVG(rating) AS avgRating
-       FROM ProductReview
-       WHERE productId = ?`,
+      `SELECT COUNT(*) AS "reviewCount", AVG(rating) AS "avgRating"
+       FROM "ProductReview"
+       WHERE "productId" = $1`,
       productId
     );
 
