@@ -1,8 +1,13 @@
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.js";
 import bcrypt from "bcryptjs";
 
-const adapter = new PrismaBetterSqlite3({ url: "file:./dev.db" });
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error("DATABASE_URL is not set");
+}
+
+const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
@@ -57,10 +62,12 @@ async function main() {
     { name: "Biography", slug: "biography", count: 50, icon: "user-pen", gradient: "from-green-700 to-green-400", description: "Biographies of the Sahaba, scholars, and great personalities in Islamic history." },
     { name: "Islamic Products", slug: "islamic-products", count: 40, icon: "mosque", gradient: "from-violet-700 to-violet-400", description: "Calligraphy, prayer mats, Attar, dates, Zamzam water, and other Islamic essentials." },
     { name: "Faith / Aqeedah", slug: "aqeedah", count: 35, icon: "heart", gradient: "from-rose-800 to-rose-500", description: "Strengthen your faith with books on Islamic creed, Tawheed, and foundational beliefs." },
+    { name: "Islamic Studies", slug: "islamic-studies", count: 30, icon: "atom", gradient: "from-cyan-800 to-indigo-600", description: "Research-driven Islamic books including civilization studies, notable Muslim personalities, and science-related topics in light of the Quran and Sunnah." },
     { name: "History", slug: "history", count: 40, icon: "landmark", gradient: "from-stone-800 to-stone-500", description: "Islamic history from the early caliphates to the Ottoman era — battles, civilizations, and scholarship." },
     { name: "Dawah", slug: "dawah", count: 30, icon: "bullhorn", gradient: "from-teal-800 to-teal-500", description: "Resources for sharing the message of Islam — comparative religion, new Muslim guides, and more." },
     { name: "Hajj / Umrah", slug: "hajj-umrah", count: 25, icon: "kaaba", gradient: "from-yellow-800 to-yellow-500", description: "Complete guides, duas, and essentials for your Hajj and Umrah pilgrimage." },
     { name: "Health / Prophetic Medicine", slug: "health", count: 15, icon: "heart-pulse", gradient: "from-lime-800 to-lime-500", description: "Prophetic medicine, natural remedies, and health guidance from the Sunnah." },
+    { name: "Women in Islam", slug: "women-in-islam", count: 20, icon: "book-heart", gradient: "from-fuchsia-800 to-rose-600", description: "Books about the lives, scholarship, and legacy of women in Islamic history." },
   ];
 
   for (const cat of categoriesData) {
@@ -70,7 +77,7 @@ async function main() {
       create: cat,
     });
   }
-  console.log("  ✅ Categories (13)");
+  console.log(`  ✅ Categories (${categoriesData.length})`);
 
   // ─── Collections ───
   const collectionsData = [
@@ -246,6 +253,16 @@ async function main() {
       language: "Arabic/Urdu", pages: 1200, weight: "400g", dimensions: "10 x 15 cm",
       inStock: true, gradient: "from-emerald-200 to-emerald-400", icon: "book-quran",
     },
+    {
+      id: "prod-17", slug: "great-women-of-islam", name: "Great Women of Islam",
+      author: "Mahmood Ahmad Ghadanfar", vendor: "DARUSSALAM", price: 1450,
+      rating: 5, reviewCount: 0, category: "Women in Islam", categorySlug: "women-in-islam",
+      badge: "new",
+      description: "Inspiring biographies of exemplary women from early Islamic history, highlighting their faith, knowledge, and contribution to the Ummah.",
+      features: JSON.stringify(["Biographies of notable Muslim women", "Authentic historical sources", "Practical lessons for modern readers", "Clear and engaging writing style"]),
+      language: "English", pages: 380, isbn: "978-603-500-410-9", weight: "520g", dimensions: "14 x 21 cm",
+      inStock: true, gradient: "from-rose-200 to-fuchsia-400", icon: "book-heart",
+    },
   ];
 
   for (const prod of productsData) {
@@ -255,7 +272,7 @@ async function main() {
       create: prod,
     });
   }
-  console.log("  ✅ Products (16)");
+  console.log(`  ✅ Products (${productsData.length})`);
 
   // ─── Customers ───
   const customersData = [

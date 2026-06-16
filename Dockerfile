@@ -15,16 +15,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set DATABASE_URL for SQLite during build
-# Uses local SQLite file during image build steps.
-ENV DATABASE_URL="file:./dev.db"
+# Build-time DATABASE_URL is required for Prisma CLI commands.
+# Runtime should override this via docker-compose/env.
+ENV DATABASE_URL="postgresql://mydeenmarket:mydeenmarket@db:5432/mydeenmarket?schema=public"
 
 # Generate Prisma client
 RUN npx prisma generate
-
-# Run migrations and seed the database
-RUN npx prisma migrate deploy
-RUN npx tsx prisma/seed.ts
 
 # Build Next.js
 RUN npm run build
@@ -47,15 +43,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy Prisma files and database
+# Copy Prisma files
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/dev.db ./dev.db
-
-# Copy native SQLite bindings needed at runtime
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/bindings ./node_modules/bindings
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/file-uri-to-path ./node_modules/file-uri-to-path
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prebuild-install ./node_modules/prebuild-install
 
 USER nextjs
 

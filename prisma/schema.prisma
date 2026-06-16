@@ -1,5 +1,5 @@
 // Darussalam PK Database Schema
-// Using SQLite for zero-config local development
+// Using PostgreSQL for local and production deployments
 
 generator client {
   provider = "prisma-client"
@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {
