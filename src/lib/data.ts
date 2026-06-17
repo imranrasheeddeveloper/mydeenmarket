@@ -11,6 +11,19 @@ export type { Product, Category, Collection, ProductReview } from "./data-types"
 export { siteConfig, formatPrice } from "./data-types";
 
 let reviewTableReady = false;
+const skipDbDuringBuild = process.env.SKIP_DB_DURING_BUILD === "1";
+
+async function withBuildFallback<T>(run: () => Promise<T>, fallback: T): Promise<T> {
+  if (!skipDbDuringBuild) {
+    return run();
+  }
+
+  try {
+    return await run();
+  } catch {
+    return fallback;
+  }
+}
 
 async function ensureReviewsTable() {
   if (reviewTableReady) return;
@@ -74,7 +87,7 @@ function mapProduct(row: {
 // ─── Site Config ───
 
 export async function getSiteConfig() {
-  const config = await prisma.siteConfig.findFirst();
+  const config = await withBuildFallback(() => prisma.siteConfig.findFirst(), null);
   if (!config) {
     return {
       name: "MyDeenMarket",
@@ -112,7 +125,7 @@ export async function getSiteConfig() {
 // ─── Categories ───
 
 export async function getCategories(): Promise<Category[]> {
-  return prisma.category.findMany({ orderBy: { name: "asc" } });
+  return withBuildFallback(() => prisma.category.findMany({ orderBy: { name: "asc" } }), []);
 }
 
 export async function getCategoryBySlug(
@@ -124,13 +137,16 @@ export async function getCategoryBySlug(
 // ─── Collections ───
 
 export async function getCollections(): Promise<Collection[]> {
-  return prisma.collection.findMany();
+  return withBuildFallback(() => prisma.collection.findMany(), []);
 }
 
 // ─── Products ───
 
 export async function getProducts(): Promise<Product[]> {
-  const rows = await prisma.product.findMany({ orderBy: { name: "asc" } });
+  const rows = await withBuildFallback(
+    () => prisma.product.findMany({ orderBy: { name: "asc" } }),
+    []
+  );
   return rows.map(mapProduct);
 }
 
@@ -152,15 +168,22 @@ export async function getProductsByCategory(
 }
 
 export async function getBestSellers(): Promise<Product[]> {
-  const rows = await prisma.product.findMany({
-    where: { badge: "bestseller" },
-    orderBy: [{ reviewCount: "desc" }, { rating: "desc" }, { name: "asc" }],
-  });
+  const rows = await withBuildFallback(
+    () =>
+      prisma.product.findMany({
+        where: { badge: "bestseller" },
+        orderBy: [{ reviewCount: "desc" }, { rating: "desc" }, { name: "asc" }],
+      }),
+    []
+  );
   return rows.map(mapProduct);
 }
 
 export async function getNewArrivals(): Promise<Product[]> {
-  const rows = await prisma.product.findMany({ where: { badge: "new" } });
+  const rows = await withBuildFallback(
+    () => prisma.product.findMany({ where: { badge: "new" } }),
+    []
+  );
   return rows.map(mapProduct);
 }
 
@@ -185,20 +208,30 @@ export async function searchProducts(query: string): Promise<Product[]> {
 }
 
 export async function getSearchableProducts(limit = 150): Promise<Product[]> {
-  const rows = await prisma.product.findMany({
-    orderBy: { name: "asc" },
-    take: limit,
-  });
+  const rows = await withBuildFallback(
+    () =>
+      prisma.product.findMany({
+        orderBy: { name: "asc" },
+        take: limit,
+      }),
+    []
+  );
   return rows.map(mapProduct);
 }
 
 export async function getAllProductSlugs(): Promise<string[]> {
-  const rows = await prisma.product.findMany({ select: { slug: true } });
+  const rows = await withBuildFallback(
+    () => prisma.product.findMany({ select: { slug: true } }),
+    []
+  );
   return rows.map((r) => r.slug);
 }
 
 export async function getAllCategorySlugs(): Promise<string[]> {
-  const rows = await prisma.category.findMany({ select: { slug: true } });
+  const rows = await withBuildFallback(
+    () => prisma.category.findMany({ select: { slug: true } }),
+    []
+  );
   return rows.map((r) => r.slug);
 }
 

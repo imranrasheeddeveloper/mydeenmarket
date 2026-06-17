@@ -18,6 +18,7 @@ COPY . .
 # Build-time DATABASE_URL is required for Prisma CLI commands.
 # Runtime should override this via docker-compose/env.
 ENV DATABASE_URL="postgresql://mydeenmarket:mydeenmarket@db:5432/mydeenmarket?schema=public"
+ENV SKIP_DB_DURING_BUILD="1"
 
 # Generate Prisma client
 RUN npx prisma generate

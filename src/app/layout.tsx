@@ -131,21 +131,25 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [categories, searchableProducts, config] = await Promise.all([
-    getCategories(),
-    getSearchableProducts(),
-    prisma.siteConfig.findFirst({
-      select: {
-        whatsappNumber: true,
-        enableMetaTracking: true,
-        metaPixelId: true,
-        enableGoogleTracking: true,
-        ga4Id: true,
-        googleAdsConversionId: true,
-        googleAdsLabel: true,
-      },
-    }),
-  ]);
+  const skipDbDuringBuild = process.env.SKIP_DB_DURING_BUILD === "1";
+
+  const [categories, searchableProducts, config] = skipDbDuringBuild
+    ? [[], [], null]
+    : await Promise.all([
+        getCategories(),
+        getSearchableProducts(),
+        prisma.siteConfig.findFirst({
+          select: {
+            whatsappNumber: true,
+            enableMetaTracking: true,
+            metaPixelId: true,
+            enableGoogleTracking: true,
+            ga4Id: true,
+            googleAdsConversionId: true,
+            googleAdsLabel: true,
+          },
+        }),
+      ]);
   const whatsappNumber = config?.whatsappNumber || "+923035036392";
   const enableMetaTracking = Boolean(config?.enableMetaTracking && config.metaPixelId);
   const enableGoogleTracking = Boolean(
