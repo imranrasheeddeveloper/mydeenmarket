@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import { getCategoryBySlug, getProductsByCategory, getCategories } from "@/lib/data";
-import { generatePageMetadata, generateBreadcrumbSchema, generateCollectionSchema } from "@/lib/seo";
+import {
+  generatePageMetadata,
+  generateBreadcrumbSchema,
+  generateCollectionSchema,
+  generateCollectionItemListSchema,
+} from "@/lib/seo";
 
 type Params = Promise<{ slug: string }>;
 
@@ -58,6 +63,14 @@ export default async function CollectionPage({ params }: { params: Params }) {
     slug,
     categoryProducts.length
   );
+  const collectionItemListSchema = generateCollectionItemListSchema(
+    `${category.name} Products`,
+    categoryProducts.map((product) => ({
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+    }))
+  );
 
   return (
     <>
@@ -68,6 +81,10 @@ export default async function CollectionPage({ params }: { params: Params }) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionItemListSchema) }}
       />
 
       {/* Breadcrumb */}

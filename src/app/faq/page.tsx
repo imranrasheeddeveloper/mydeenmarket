@@ -1,18 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Metadata } from "next";
 import { siteConfig } from "@/lib/data-types";
-
-const metadata: Metadata = {
-  title: "FAQs",
-  description: "Frequently asked questions about MyDeenMarket, our products, shipping, and ordering process.",
-  openGraph: {
-    title: "FAQs",
-    description: "Find answers to common questions about MyDeenMarket.",
-    url: `${siteConfig.url}/faq`,
-  },
-};
 
 interface FAQItem {
   id: number;
@@ -196,7 +185,7 @@ export default function FAQPage() {
 
           {/* Still Have Questions */}
           <div className="mt-16 bg-slate-50 rounded-xl p-8 text-center">
-            <h3 className="text-2xl font-bold text-[#0f172a] mb-4">Didn't find your answer?</h3>
+            <h3 className="text-2xl font-bold text-[#0f172a] mb-4">Didn&apos;t find your answer?</h3>
             <p className="text-slate-600 mb-6">
               Our customer support team is here to help. Reach out to us anytime.
             </p>

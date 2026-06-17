@@ -140,6 +140,7 @@ export function generateWebSiteSchema() {
 }
 
 export function generateProductSchema(product: {
+  id?: string;
   name: string;
   slug: string;
   description: string;
@@ -151,12 +152,54 @@ export function generateProductSchema(product: {
   inStock: boolean;
   language: string;
   author: string;
+  category?: string;
+  imageUrl?: string | null;
+  images?: string[];
+  reviews?: Array<{
+    authorName: string;
+    rating: number;
+    comment: string;
+    createdAt?: string;
+  }>;
 }) {
+  const imageCandidates = Array.from(
+    new Set([
+      ...(product.imageUrl ? [product.imageUrl] : []),
+      ...(product.images || []),
+    ])
+  ).slice(0, 10);
+
+  const images = imageCandidates.map((img) =>
+    img.startsWith("http://") || img.startsWith("https://")
+      ? img
+      : `${siteConfig.url}${img.startsWith("/") ? "" : "/"}${img}`
+  );
+
+  const reviews = (product.reviews || []).slice(0, 10).map((review) => ({
+    "@type": "Review",
+    reviewRating: {
+      "@type": "Rating",
+      ratingValue: review.rating,
+      bestRating: 5,
+    },
+    author: {
+      "@type": "Person",
+      name: review.authorName,
+    },
+    reviewBody: review.comment,
+    datePublished: review.createdAt,
+  }));
+
   return {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": `${siteConfig.url}/product/${product.slug}#product`,
     name: product.name,
     description: product.description,
+    image: images.length > 0 ? images : [`${siteConfig.url}/og-image.jpg`],
+    sku: product.id,
+    mpn: product.isbn || product.id,
+    category: product.category,
     brand: {
       "@type": "Brand",
       name: product.vendor,
@@ -179,6 +222,7 @@ export function generateProductSchema(product: {
         name: siteConfig.name,
       },
       url: `${siteConfig.url}/product/${product.slug}`,
+      itemCondition: "https://schema.org/NewCondition",
       shippingDetails: {
         "@type": "OfferShippingDetails",
         shippingDestination: {
@@ -203,6 +247,7 @@ export function generateProductSchema(product: {
           ratingCount: product.reviewCount,
         }
       : undefined,
+    review: reviews.length > 0 ? reviews : undefined,
     url: `${siteConfig.url}/product/${product.slug}`,
   };
 }
@@ -244,6 +289,33 @@ export function generateCollectionSchema(
       numberOfItems: productCount,
       name,
     },
+  };
+}
+
+export function generateCollectionItemListSchema(
+  name: string,
+  products: { name: string; slug: string; price: number }[]
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name,
+    numberOfItems: products.length,
+    itemListElement: products.slice(0, 24).map((product, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      item: {
+        "@type": "Product",
+        name: product.name,
+        url: `${siteConfig.url}/product/${product.slug}`,
+        offers: {
+          "@type": "Offer",
+          price: product.price,
+          priceCurrency: "PKR",
+          availability: "https://schema.org/InStock",
+        },
+      },
+    })),
   };
 }
 

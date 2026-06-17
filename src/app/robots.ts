@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/account", "/checkout", "/api/", "/admin", "/_next/"],
+        disallow: ["/account", "/checkout", "/api/", "/admin"],
       },
       {
         userAgent: "Googlebot",
@@ -72,7 +72,10 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/"],
       },
     ],
-    sitemap: "https://mydeenmarket.com/sitemap.xml",
+    sitemap: [
+      "https://mydeenmarket.com/sitemap.xml",
+      "https://mydeenmarket.com/sitemap-images.xml",
+    ],
     host: "https://mydeenmarket.com",
   };
 }

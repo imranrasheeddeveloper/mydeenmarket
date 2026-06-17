@@ -2,16 +2,35 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import { getProducts, getCategories } from "@/lib/data";
-import { generatePageMetadata, generateBreadcrumbSchema } from "@/lib/seo";
+import { generatePageMetadata, generateBreadcrumbSchema, generateCollectionItemListSchema } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = generatePageMetadata({
-  title: "All Collections — Islamic Books & Products",
-  description:
-    "Browse Islamic books, Abaya, Tasbih, Zamzam water, Ihram & more at MyDeenMarket. Free shipping over Rs. 5,000. Cash on delivery across Pakistan.",
-  path: "/collections",
-});
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; filter?: string }>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const query = params.q?.trim();
+  const filter = params.filter?.trim();
+
+  if (query || filter) {
+    return generatePageMetadata({
+      title: "Collections Search",
+      description: "Search and filtered collections view.",
+      path: "/collections",
+      noIndex: true,
+    });
+  }
+
+  return generatePageMetadata({
+    title: "All Collections — Islamic Books & Products",
+    description:
+      "Browse Islamic books, Abaya, Tasbih, Zamzam water, Ihram & more at MyDeenMarket. Free shipping over Rs. 5,000. Cash on delivery across Pakistan.",
+    path: "/collections",
+  });
+}
 
 export default async function CollectionsPage({
   searchParams,
@@ -65,6 +84,14 @@ export default async function CollectionsPage({
     { name: "Home", url: "/" },
     { name: "Collections", url: "/collections" },
   ]);
+  const itemListSchema = generateCollectionItemListSchema(
+    "All Collections",
+    filtered.map((product) => ({
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+    }))
+  );
 
   const pageTitle = query
     ? `Search results for "${query}"`
@@ -77,6 +104,10 @@ export default async function CollectionsPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
 
       {/* Breadcrumb */}

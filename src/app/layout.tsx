@@ -28,6 +28,9 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
+  applicationName: siteConfig.name,
+  referrer: "origin-when-cross-origin",
+  category: "ecommerce",
   title: {
     default: siteConfig.title,
     template: `%s | ${siteConfig.name}`,
@@ -106,7 +109,13 @@ export const metadata: Metadata = {
     title: siteConfig.title,
     description: siteConfig.description,
     images: [`${siteConfig.url}/og-image.jpg`],
+    creator: "@mydeenmarket",
   },
+  manifest: "/manifest.webmanifest",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
   robots: {
     index: true,
     follow: true,
@@ -123,6 +132,10 @@ export const metadata: Metadata = {
   // },
   alternates: {
     canonical: siteConfig.url,
+    languages: {
+      en: siteConfig.url,
+      "x-default": siteConfig.url,
+    },
   },
 };
 

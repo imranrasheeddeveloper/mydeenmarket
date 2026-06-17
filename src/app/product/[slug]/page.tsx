@@ -70,7 +70,15 @@ export default async function ProductPage({ params }: { params: Params }) {
     { name: product.name, url: `/product/${slug}` },
   ]);
 
-  const productSchema = generateProductSchema(product);
+  const enrichedProductSchema = generateProductSchema({
+    ...product,
+    reviews: productReviews.map((review) => ({
+      authorName: review.customerName,
+      rating: review.rating,
+      comment: review.comment,
+      createdAt: review.createdAt,
+    })),
+  });
 
   return (
     <>
@@ -80,7 +88,7 @@ export default async function ProductPage({ params }: { params: Params }) {
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(enrichedProductSchema) }}
       />
       <ProductViewTracker
         id={product.id}
