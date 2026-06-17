@@ -127,9 +127,9 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  // verification: {
-  //   google: "YOUR_GOOGLE_VERIFICATION_CODE",
-  // },
+  verification: {
+    google: "3OqK0shr18RFCMcJ2Qaa8KfFyL7Dt5FKy4CyRIPh7lk",
+  },
   alternates: {
     canonical: siteConfig.url,
     languages: {
