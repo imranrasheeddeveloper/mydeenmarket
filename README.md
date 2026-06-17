@@ -302,7 +302,9 @@ docker-compose up --build
 |---|---|
 | `npm run db:migrate` | Run Prisma migrations |
 | `npm run db:seed` | Seed database with sample products |
-| `npm run db:reset` | Reset database (destructive) |
+| `npm run db:reset` | Reset database (interactive confirmation required) |
+| `npm run db:reset:force` | Reset database without prompt (destructive) |
+| `npm run db:clear:products -- --yes-clear-products` | Delete all products (destructive, explicit flag required) |
 | `npm run db:studio` | Open Prisma Studio GUI |
 
 ---
@@ -330,10 +332,16 @@ npm run backup:prod
 npm run restore:local
 ```
 
+For safety, restore requires explicit confirmation:
+
+```bash
+CONFIRM_RESTORE=yes npm run restore:local
+```
+
 You can restore from a specific snapshot:
 
 ```bash
-./scripts/restore-local-from-backup.sh ./backups/production/20260616-193000
+CONFIRM_RESTORE=yes ./scripts/restore-local-from-backup.sh ./backups/production/20260616-193000
 ```
 
 Configurable environment variables for scripts:

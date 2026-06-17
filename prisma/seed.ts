@@ -51,6 +51,7 @@ async function main() {
 
   // ─── Categories ───
   const categoriesData = [
+    { name: "Bundle", slug: "bundle", count: 140, icon: "package", gradient: "from-emerald-900 to-cyan-700", description: "Special value bundles including Umrah bundle, Hajj bundle, and curated books bundles." },
     { name: "Quran", slug: "quran", count: 120, icon: "book-quran", gradient: "from-emerald-900 to-emerald-600", description: "Explore our extensive collection of Quran translations, Tafseer, and Tajweed guides." },
     { name: "Qaida / Nazra", slug: "qaida-nazra", count: 40, icon: "book", gradient: "from-emerald-800 to-cyan-600", description: "Noorani Qaida, Qurani Qaida, and Nazra learning books for beginners and kids." },
     { name: "Hadith", slug: "hadith", count: 85, icon: "book-open", gradient: "from-sky-900 to-sky-600", description: "Authentic Hadith collections including Sahih Bukhari, Sahih Muslim, and other renowned compilations." },
@@ -65,6 +66,7 @@ async function main() {
     { name: "Dawah", slug: "dawah", count: 30, icon: "bullhorn", gradient: "from-teal-800 to-teal-500", description: "Resources for sharing the message of Islam — comparative religion, new Muslim guides, and more." },
     { name: "Hajj / Umrah", slug: "hajj-umrah", count: 25, icon: "kaaba", gradient: "from-yellow-800 to-yellow-500", description: "Complete guides, duas, and essentials for your Hajj and Umrah pilgrimage." },
     { name: "Health / Prophetic Medicine", slug: "health", count: 15, icon: "heart-pulse", gradient: "from-lime-800 to-lime-500", description: "Prophetic medicine, natural remedies, and health guidance from the Sunnah." },
+    { name: "Fitar", slug: "fitar", count: 20, icon: "gift", gradient: "from-amber-800 to-rose-600", description: "Ramadan and Eid Fitar packs, gifting hampers, and essentials for sharing." },
   ];
 
   for (const cat of categoriesData) {
@@ -74,7 +76,7 @@ async function main() {
       create: cat,
     });
   }
-  console.log("  ✅ Categories (13)");
+  console.log(`  ✅ Categories (${categoriesData.length})`);
 
   // ─── Collections ───
   const collectionsData = [
@@ -250,16 +252,57 @@ async function main() {
       language: "Arabic/Urdu", pages: 1200, weight: "400g", dimensions: "10 x 15 cm",
       inStock: true, gradient: "from-emerald-200 to-emerald-400", icon: "book-quran",
     },
+    {
+      id: "prod-17", slug: "umrah-bundle-complete", name: "Umrah Bundle - Complete Essentials",
+      author: "MyDeenMarket Team", vendor: "MYDEENMARKET", price: 7990,
+      rating: 5, reviewCount: 88, category: "Bundle", categorySlug: "bundle",
+      badge: "bestseller",
+      description: "A complete Umrah bundle including Umrah guide book, dua booklet, pocket tasbih, and ihram-friendly essentials in one value package.",
+      features: JSON.stringify(["Complete Umrah essentials in one box", "Step-by-step Umrah guide included", "Gift-ready packaging", "Best-value bundle pricing"]),
+      language: "English/Urdu", pages: 220, weight: "1500g", dimensions: "30 x 24 cm",
+      inStock: true, gradient: "from-cyan-200 to-emerald-400", icon: "package",
+    },
+    {
+      id: "prod-18", slug: "hajj-bundle-premium", name: "Hajj Bundle - Premium Pilgrim Pack",
+      author: "MyDeenMarket Team", vendor: "MYDEENMARKET", price: 9990,
+      rating: 5, reviewCount: 102, category: "Bundle", categorySlug: "bundle",
+      badge: "bestseller",
+      description: "Premium Hajj bundle with Hajj manual, selected duas, checklist cards, and practical items to support your entire pilgrimage journey.",
+      features: JSON.stringify(["Premium Hajj preparation kit", "Hajj manual and dua cards", "Travel-friendly organization", "Ideal for first-time pilgrims"]),
+      language: "English/Urdu", pages: 300, weight: "1800g", dimensions: "32 x 25 cm",
+      inStock: true, gradient: "from-amber-200 to-orange-400", icon: "package",
+    },
+    {
+      id: "prod-19", slug: "books-bundle-family-learning", name: "Books Bundle - Family Learning Set",
+      author: "MyDeenMarket Team", vendor: "MYDEENMARKET", price: 6490,
+      rating: 5, reviewCount: 74, category: "Bundle", categorySlug: "bundle",
+      badge: "bestseller",
+      description: "A family-focused books bundle with selected Quran study, Seerah, and children learning titles for a complete home Islamic library starter set.",
+      features: JSON.stringify(["Curated family Islamic library set", "Includes adults and kids titles", "Balanced Quran, Seerah, and Akhlaq themes", "High savings versus individual prices"]),
+      language: "English/Urdu/Arabic", pages: 540, weight: "2200g", dimensions: "34 x 26 cm",
+      inStock: true, gradient: "from-violet-200 to-sky-400", icon: "package",
+    },
+    {
+      id: "prod-20", slug: "fitar-essentials-pack", name: "Fitar Essentials Pack",
+      author: "MyDeenMarket Team", vendor: "MYDEENMARKET", price: 2990,
+      rating: 5, reviewCount: 18, category: "Fitar", categorySlug: "fitar",
+      badge: "new",
+      description: "A practical Fitar pack for Ramadan and Eid season with gifting essentials prepared for families and communities.",
+      features: JSON.stringify(["Ready-to-share Ramadan and Eid pack", "Community friendly quantity", "Neat gift packaging", "Budget-conscious value"]),
+      language: "N/A", pages: null, weight: "1200g", dimensions: "28 x 22 cm",
+      inStock: true, gradient: "from-rose-200 to-amber-300", icon: "gift",
+    },
   ];
 
   for (const prod of productsData) {
+    const { id: _ignoredId, ...productData } = prod;
     await prisma.product.upsert({
       where: { slug: prod.slug },
-      update: prod,
-      create: prod,
+      update: productData,
+      create: productData,
     });
   }
-  console.log("  ✅ Products (16)");
+  console.log(`  ✅ Products (${productsData.length})`);
 
   // ─── Customers ───
   const customersData = [

@@ -154,6 +154,7 @@ export async function getProductsByCategory(
 export async function getBestSellers(): Promise<Product[]> {
   const rows = await prisma.product.findMany({
     where: { badge: "bestseller" },
+    orderBy: [{ reviewCount: "desc" }, { rating: "desc" }, { name: "asc" }],
   });
   return rows.map(mapProduct);
 }

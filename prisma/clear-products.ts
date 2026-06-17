@@ -8,7 +8,22 @@ const adapter = new PrismaPg({
 });
 const prisma = new PrismaClient({ adapter });
 
+function hasConfirmFlag() {
+  return process.argv.includes("--yes-clear-products");
+}
+
 async function main() {
+  if (!hasConfirmFlag()) {
+    console.error(
+      "Refusing to clear products without explicit confirmation."
+    );
+    console.error(
+      "Run: npm run db:clear:products -- --yes-clear-products"
+    );
+    process.exitCode = 1;
+    return;
+  }
+
   console.log("Clearing catalog products...");
 
   // Keep historical orders by detaching product references first.
