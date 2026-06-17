@@ -8,7 +8,7 @@ import { getProducts, getCategories, getCollections } from "@/lib/data";
 import { generateBreadcrumbSchema, generateFAQSchema, generateItemListSchema } from "@/lib/seo";
 import {
   Truck, Zap, ShieldCheck, Lock, BookOpen, Star, ArrowRight,
-  Heart, Gift, Users, BookMarked, Scroll, Moon, ChevronRight, Mail,
+  Heart, BookMarked, ChevronRight, Mail,
   BookText, HandHeart, Sparkles, Scale, Baby, Feather, Gem, Landmark, Megaphone, Compass, Leaf,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -16,16 +16,20 @@ import type { LucideIcon } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [products, categories, collections] = await Promise.all([
+  const [rawProducts, categories, collections] = await Promise.all([
     getProducts(), getCategories(), getCollections(),
   ]);
+  const products = rawProducts.map((product) => ({
+    ...product,
+    // Keep listing payload small; full descriptions are only needed on product pages.
+    description: product.description.slice(0, 180),
+    features: [],
+  }));
   const newArrivals = products.filter((p) => p.badge === "new");
   const mainCategories = categories.slice(0, 8);
   const mainCollections = collections.slice(0, 6);
   const breadcrumbSchema = generateBreadcrumbSchema([{ name: "Home", url: "/" }]);
 
-  const bestSellers = products.filter((p) => p.badge === "bestseller");
-  
   // Top rated products (sorted by rating)
   const topRated = [...products]
     .sort((a, b) => (b.rating || 0) - (a.rating || 0))
@@ -36,9 +40,6 @@ export default async function HomePage() {
     .sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0))
     .slice(0, 8);
 
-  // New bestsellers (products that are both new and bestseller)
-  const newBestsellers = products.filter((p) => p.badge === "bestseller").slice(0, 4);
-  
   // Category-specific best sellers
   const categoryBestSellers = {
     quran: products.filter((p) => p.category === "quran" && p.badge === "bestseller").slice(0, 4),
@@ -356,7 +357,7 @@ export default async function HomePage() {
             <AnimateOnScroll animation="fade-up">
               <div className="flex items-end justify-between mb-12">
                 <div>
-                  <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Prophet's Biography</p>
+                  <p className="text-xs font-semibold tracking-[0.3em] text-[#d4a853] uppercase mb-3">Prophet&apos;s Biography</p>
                   <h2 id="seerah-bestsellers-heading" className="text-3xl sm:text-4xl font-bold text-slate-900 font-[family-name:var(--font-playfair)]">Best Selling Seerah Books</h2>
                 </div>
                 <Link href="/collections/seerah" className="hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-slate-200 text-sm font-medium text-slate-600 hover:bg-white hover:border-slate-300 transition-all group">
