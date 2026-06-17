@@ -19,20 +19,22 @@ function toAbsoluteUrl(url: string): string {
 }
 
 export async function GET() {
-  const products = await prisma.product.findMany({
-    select: {
-      slug: true,
-      name: true,
-      description: true,
-      price: true,
-      inStock: true,
-      imageUrl: true,
-      images: true,
-      vendor: true,
-      category: true,
-    },
-    orderBy: { name: "asc" },
-  });
+  const products = await prisma.product
+    .findMany({
+      select: {
+        slug: true,
+        name: true,
+        description: true,
+        price: true,
+        inStock: true,
+        imageUrl: true,
+        images: true,
+        vendor: true,
+        category: true,
+      },
+      orderBy: { name: "asc" },
+    })
+    .catch(() => []);
 
   const itemXml = products
     .map((product) => {

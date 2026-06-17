@@ -5,12 +5,14 @@ const BASE_URL = "https://mydeenmarket.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [products, categories, collections] = await Promise.all([
-    prisma.product.findMany({
-      select: { slug: true, categorySlug: true, createdAt: true },
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.category.findMany({ select: { slug: true } }),
-    prisma.collection.findMany({ select: { slug: true } }),
+    prisma.product
+      .findMany({
+        select: { slug: true, categorySlug: true, createdAt: true },
+        orderBy: { createdAt: "desc" },
+      })
+      .catch(() => []),
+    prisma.category.findMany({ select: { slug: true } }).catch(() => []),
+    prisma.collection.findMany({ select: { slug: true } }).catch(() => []),
   ]);
 
   const now = new Date();
