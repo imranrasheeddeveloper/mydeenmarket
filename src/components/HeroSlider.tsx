@@ -204,7 +204,7 @@ export default function HeroSlider() {
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-6">
         <button
           onClick={() => goTo((current - 1 + slides.length) % slides.length)}
-          className="w-10 h-10 rounded-full border border-white/15 hover:border-[#d4a853]/40 flex items-center justify-center text-white/50 hover:text-[#d4a853] transition-all bg-white/5 hover:bg-white/10 backdrop-blur-sm"
+          className="w-12 h-12 sm:w-10 sm:h-10 rounded-full border border-white/15 hover:border-[#d4a853]/40 flex items-center justify-center text-white/50 hover:text-[#d4a853] transition-all bg-white/5 hover:bg-white/10 backdrop-blur-sm"
           aria-label="Previous slide"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -226,7 +226,7 @@ export default function HeroSlider() {
         </div>
         <button
           onClick={next}
-          className="w-10 h-10 rounded-full border border-white/15 hover:border-[#d4a853]/40 flex items-center justify-center text-white/50 hover:text-[#d4a853] transition-all bg-white/5 hover:bg-white/10 backdrop-blur-sm"
+          className="w-12 h-12 sm:w-10 sm:h-10 rounded-full border border-white/15 hover:border-[#d4a853]/40 flex items-center justify-center text-white/50 hover:text-[#d4a853] transition-all bg-white/5 hover:bg-white/10 backdrop-blur-sm"
           aria-label="Next slide"
         >
           <ChevronRight className="w-4 h-4" />

@@ -97,10 +97,10 @@ export default async function Footer() {
 
           {/* Shop by Category */}
           <div>
-            <h4 className="text-[#d4a853] font-bold text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
+            <h3 className="text-[#d4a853] font-bold text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
               <span className="w-4 h-px bg-[#d4a853]/40" />
               Shop by Category
-            </h4>
+            </h3>
             <ul className="space-y-2.5">
               {mainCategories.map((cat) => (
                 <li key={cat.slug}>
@@ -117,10 +117,10 @@ export default async function Footer() {
 
           {/* Who We Are */}
           <div>
-            <h4 className="text-[#d4a853] font-bold text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
+            <h3 className="text-[#d4a853] font-bold text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
               <span className="w-4 h-px bg-[#d4a853]/40" />
               Who We Are
-            </h4>
+            </h3>
             <ul className="space-y-2.5">
               <li><Link href="/about" className="text-sm text-slate-400 hover:text-[#d4a853] transition-colors">About Us</Link></li>
               <li><Link href="/faq" className="text-sm text-slate-400 hover:text-[#d4a853] transition-colors">FAQ</Link></li>
@@ -133,10 +133,10 @@ export default async function Footer() {
 
           {/* My Account */}
           <div>
-            <h4 className="text-[#d4a853] font-bold text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
+            <h3 className="text-[#d4a853] font-bold text-sm uppercase tracking-wider mb-5 flex items-center gap-2">
               <span className="w-4 h-px bg-[#d4a853]/40" />
               My Account
-            </h4>
+            </h3>
             <ul className="space-y-2.5">
               <li><Link href="/account" className="text-sm text-slate-400 hover:text-[#d4a853] transition-colors">Orders</Link></li>
               <li><Link href="/account" className="text-sm text-slate-400 hover:text-[#d4a853] transition-colors">Profile</Link></li>

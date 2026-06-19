@@ -300,7 +300,7 @@ export default function Header({
                 </Link>
                 <div className="invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all duration-300 absolute top-full left-0 w-[560px] bg-white rounded-xl border border-slate-100 p-6 grid grid-cols-2 gap-6 z-50 shadow-xl shadow-slate-200/50">
                   <div>
-                    <h4 className="font-bold text-[#d4a853] mb-3 text-xs uppercase tracking-wider">Holy Quran &amp; Hadith</h4>
+                    <h3 className="font-bold text-[#d4a853] mb-3 text-xs uppercase tracking-wider">Holy Quran & Hadith</h3>
                     <div className="space-y-2.5">
                       <Link href="/collections/quran" className="block text-slate-500 hover:text-[#d4a853] text-sm transition-colors">Quran</Link>
                       <Link href="/collections/hadith" className="block text-slate-500 hover:text-[#d4a853] text-sm transition-colors">Hadith</Link>
@@ -309,7 +309,7 @@ export default function Header({
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-bold text-[#d4a853] mb-3 text-xs uppercase tracking-wider">Islamic Knowledge</h4>
+                    <h3 className="font-bold text-[#d4a853] mb-3 text-xs uppercase tracking-wider">Islamic Knowledge</h3>
                     <div className="space-y-2.5">
                       <Link href="/collections/fiqh" className="block text-slate-500 hover:text-[#d4a853] text-sm transition-colors">Fiqh</Link>
                       <Link href="/collections/aqeedah" className="block text-slate-500 hover:text-[#d4a853] text-sm transition-colors">Faith / Aqeedah</Link>
@@ -345,7 +345,7 @@ export default function Header({
               onFocus={() => setMobileSearchOpen(true)}
               autoComplete="off"
             />
-            <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" aria-label="Search">
+            <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 sm:right-3 w-10 h-10 sm:w-auto sm:h-auto flex items-center justify-center" aria-label="Search">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </button>
           </form>

@@ -66,6 +66,7 @@ export default function ProductCard({ product }: { product: Product }) {
             alt={product.name}
             loading="lazy"
             className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           />
         ) : (
           <div className={`w-full h-full bg-gradient-to-br ${product.gradient} flex flex-col items-center justify-center gap-3 p-6 group-hover:scale-[1.05] transition-transform duration-700 ease-out`}>
@@ -80,7 +81,7 @@ export default function ProductCard({ product }: { product: Product }) {
             {badgeLabels[product.badge]}
           </span>
         )}
-        <button className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 z-10 shadow-sm" aria-label={`Add ${product.name} to wishlist`}>
+        <button className="absolute top-3 right-3 w-10 h-10 sm:w-8 sm:h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 z-10 shadow-sm" aria-label={`Add ${product.name} to wishlist`}>
           <Heart className="w-3.5 h-3.5 text-slate-500" />
         </button>
       </Link>
@@ -94,7 +95,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <span className="text-lg font-bold text-slate-900">{formatPrice(product.price)}</span>
           {product.compareAtPrice && <span className="text-xs text-slate-400 line-through">{formatPrice(product.compareAtPrice)}</span>}
         </div>
-        <button onClick={addToCart} className="mt-4 w-full py-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-white text-xs font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 hover:shadow-lg" aria-label={`Add ${product.name} to cart`}>
+        <button onClick={addToCart} className="mt-4 w-full py-3 sm:py-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-white text-xs font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 hover:shadow-lg min-h-[44px]" aria-label={`Add ${product.name} to cart`}>
           <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
         </button>
       </div>

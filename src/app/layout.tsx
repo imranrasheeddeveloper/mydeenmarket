@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { Inter, Playfair_Display } from "next/font/google";
+import dynamic from "next/dynamic";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import CartDrawer from "@/components/CartDrawer";
 import AuthProvider from "@/components/AuthProvider";
 import { CurrencyProvider } from "@/components/CurrencyProvider";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import TrackingPageView from "@/components/TrackingPageView";
 import { siteConfig } from "@/lib/data-types";
+
+const CartDrawer = dynamic(() => import("@/components/CartDrawer"), { ssr: false });
+const WhatsAppButton = dynamic(() => import("@/components/WhatsAppButton"), { ssr: false });
 import { getCategories, getSearchableProducts } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
 import { generateOrganizationSchema, generateWebSiteSchema, generateSiteNavigationSchema } from "@/lib/seo";
@@ -179,6 +181,17 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${playfair.variable} h-full`}>
       <head>
+        <style dangerouslySetInnerHTML={{ __html: `
+          /* Critical above-the-fold CSS */
+          html, body { margin: 0; padding: 0; }
+          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif; background: #fafafa; color: #0f172a; }
+          * { box-sizing: border-box; }
+          img { max-width: 100%; display: block; }
+          /* Header critical styles */
+          header { background: white; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 50; }
+          /* Hero critical styles */
+          section[aria-label="Featured promotions"] { background: black; overflow: hidden; position: relative; }
+        ` }} />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preload" href="https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLm4lsHyVIjQ.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
