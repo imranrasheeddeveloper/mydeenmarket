@@ -181,6 +181,9 @@ export default async function RootLayout({
       <head>
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preload" href="https://fonts.gstatic.com/s/inter/v13/UcC73FwrK3iLm4lsHyVIjQ.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vgj4veuGiw5wpj6wEAw_zeMQkBWc0rffuPM9MxNmZrUltC.0.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/uploads/hero/hero-1.webp" as="image" type="image/webp" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

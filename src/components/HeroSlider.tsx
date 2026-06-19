@@ -73,14 +73,18 @@ export default function HeroSlider() {
             className={`absolute inset-0 transition-all duration-700 ease-in-out ${
               i === current ? "opacity-100 visible" : "opacity-0 invisible"
             }`}
-            style={{
-              backgroundImage: `url('${slide.bgImage.src}')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-            }}
             aria-hidden={i !== current}
           >
+            <Image
+              src={slide.bgImage.src}
+              alt=""
+              fill
+              priority={i === 0}
+              fetchPriority={i === 0 ? "high" : "low"}
+              className="object-cover"
+              quality={85}
+              sizes="100vw"
+            />
             {/* Dark overlay for text readability */}
             <div 
               className="absolute inset-0" 

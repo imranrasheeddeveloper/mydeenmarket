@@ -128,9 +128,9 @@ export default function Header({
       <div className="bg-gradient-to-r from-[#0d5d4f] via-[#1a3d3a] to-[#0d5d4f] text-white text-center text-[13px] py-2.5 px-4 font-medium tracking-wider relative overflow-hidden">
         <div className="absolute inset-0 opacity-30" style={{ backgroundImage: `radial-gradient(circle at 20% 50%, rgba(212,168,83,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(13,148,136,0.06) 0%, transparent 50%)` }} />
         <p className="flex items-center justify-center gap-2 relative z-10">
-          <span className="text-[#d4a853]">✦</span>
+          <span className="text-amber-300">✦</span>
           FREE SHIPPING ON ORDERS OVER RS. {siteConfig.freeShippingThreshold.toLocaleString()}
-          <span className="text-[#d4a853]">✦</span>
+          <span className="text-amber-300">✦</span>
         </p>
       </div>
 
@@ -143,7 +143,7 @@ export default function Header({
               <Image src="/logo-icon.svg" alt="MyDeenMarket logo" width={36} height={36} className="rounded-lg" priority />
               <div>
                 <span className="text-lg font-bold text-slate-900 tracking-tight">MyDeenMarket</span>
-                <span className="block text-[10px] font-semibold tracking-[0.2em] text-[#d4a853] uppercase -mt-0.5">Islamic Books</span>
+                <span className="block text-[10px] font-semibold tracking-[0.2em] text-[#c9a246] uppercase -mt-0.5">Islamic Books</span>
               </div>
             </Link>
 

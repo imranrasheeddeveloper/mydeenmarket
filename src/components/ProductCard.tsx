@@ -10,7 +10,7 @@ import {
 function StarRating({ rating, count }: { rating: number; count: number }) {
   return (
     <div className="flex items-center gap-1">
-      <div className="flex items-center gap-0.5" aria-label={`${rating} out of 5 stars`}>
+      <div className="flex items-center gap-0.5" role="img" aria-label={`${rating} out of 5 stars`}>
         {[...Array(5)].map((_, i) => (
           <Star key={i} className={`w-3 h-3 ${i < rating ? "text-amber-400 fill-amber-400" : "text-slate-200"}`} />
         ))}
@@ -64,6 +64,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <img
             src={product.imageUrl}
             alt={product.name}
+            loading="lazy"
             className="w-full h-full object-cover group-hover:scale-[1.05] transition-transform duration-700 ease-out"
           />
         ) : (

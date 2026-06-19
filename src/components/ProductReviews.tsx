@@ -30,7 +30,7 @@ function formatDate(iso: string) {
 
 function Stars({ rating }: { rating: number }) {
   return (
-    <div className="flex items-center" aria-label={`${rating} out of 5 stars`}>
+    <div className="flex items-center" role="img" aria-label={`${rating} out of 5 stars`}>
       {[1, 2, 3, 4, 5].map((i) => (
         <svg
           key={i}
