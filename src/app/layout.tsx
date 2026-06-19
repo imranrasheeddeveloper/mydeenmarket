@@ -10,8 +10,8 @@ import { CurrencyProvider } from "@/components/CurrencyProvider";
 import TrackingPageView from "@/components/TrackingPageView";
 import { siteConfig } from "@/lib/data-types";
 
-const CartDrawer = dynamic(() => import("@/components/CartDrawer"), { ssr: false });
-const WhatsAppButton = dynamic(() => import("@/components/WhatsAppButton"), { ssr: false });
+const CartDrawer = dynamic(() => import("@/components/CartDrawer"));
+const WhatsAppButton = dynamic(() => import("@/components/WhatsAppButton"));
 import { getCategories, getSearchableProducts } from "@/lib/data";
 import { prisma } from "@/lib/prisma";
 import { generateOrganizationSchema, generateWebSiteSchema, generateSiteNavigationSchema } from "@/lib/seo";
