@@ -182,38 +182,6 @@ export default function HeroSlider() {
                 {/* Outer border frames */}
                 <div className="absolute inset-0 rounded-[2rem] border border-[#d4a853]/10" />
                 <div className="absolute inset-3 rounded-[1.6rem] border border-[#d4a853]/[0.07]" />
-                {/* Inner content */}
-                <div className="absolute inset-6 rounded-[1.2rem] bg-white/[0.03] backdrop-blur-sm flex flex-col items-center justify-center">
-                  <div className="w-16 h-16 rounded-2xl bg-[#d4a853]/10 flex items-center justify-center mb-5 border border-[#d4a853]/15">
-                    <svg
-                      className="w-8 h-8 text-[#d4a853]/60"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                      />
-                    </svg>
-                  </div>
-                  <p
-                    className="text-[#d4a853]/40 text-3xl font-[family-name:var(--font-playfair)] mb-3"
-                    dir="rtl"
-                    aria-hidden="true"
-                  >
-                    ﷽
-                  </p>
-                  <div className="w-16 h-px bg-gradient-to-r from-transparent via-[#d4a853]/25 to-transparent mb-3" />
-                  <p className="text-slate-400 text-xs tracking-[0.25em] uppercase">
-                    MyDeenMarket
-                  </p>
-                  <p className="text-slate-500 text-[10px] tracking-[0.15em] uppercase mt-1">
-                    Est. 2024
-                  </p>
-                </div>
                 {/* Glow accents */}
                 <div
                   className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-40 h-12 bg-[#d4a853]/[0.08] rounded-full blur-2xl animate-pulse"

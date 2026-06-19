@@ -43,20 +43,20 @@ export const islamicStockImages = [
 export const heroImages = [
   {
     id: 1,
-    src: "https://images.unsplash.com/photo-1599043513691-a5f9ae0d48ee?w=1920&h=1080&fit=crop&q=80",
-    alt: "Islamic geometric pattern with emerald and gold",
-    overlayColor: "rgba(13, 93, 79, 0.4)",
+    src: "/uploads/hero/hero-1.webp",
+    alt: "Premium studio-style hero image featuring an Islamic book collection",
+    overlayColor: "rgba(8, 24, 37, 0.45)",
   },
   {
     id: 2,
-    src: "https://images.unsplash.com/photo-1564221713784-002eeba-90a1eef46637?w=1920&h=1080&fit=crop&q=80",
-    alt: "Golden Islamic mosque architecture",
-    overlayColor: "rgba(13, 93, 79, 0.45)",
+    src: "/uploads/hero/hero-2.webp",
+    alt: "Professional hero composition with rich lighting and Islamic title imagery",
+    overlayColor: "rgba(9, 20, 33, 0.42)",
   },
   {
     id: 3,
-    src: "https://images.unsplash.com/photo-1578394209840-a55e1e8f30a5?w=1920&h=1080&fit=crop&q=80",
-    alt: "Traditional Islamic art and calligraphy",
-    overlayColor: "rgba(13, 93, 79, 0.4)",
+    src: "/uploads/hero/hero-3.webp",
+    alt: "Cinematic Islamic book hero visual with polished editorial treatment",
+    overlayColor: "rgba(6, 18, 29, 0.48)",
   },
 ];

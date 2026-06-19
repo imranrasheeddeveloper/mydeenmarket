@@ -152,73 +152,63 @@ export default async function HomePage() {
       </section>
 
       {/* Categories */}
-      <section className="py-20 md:py-28 gradient-dark-warm relative overflow-hidden" aria-labelledby="categories-heading">
-        {/* Noor effects */}
-        <div className="noor-glow w-[500px] h-[500px] top-[-100px] right-[-100px]" />
-        <div className="noor-bubble w-[300px] h-[300px] bottom-[10%] left-[-50px]" />
-        <div className="noor-bubble-teal w-[250px] h-[250px] top-[20%] right-[10%]" />
-        <div className="noor-sparkle top-[15%] left-[20%]" style={{ animationDelay: '0s' }} />
-        <div className="noor-sparkle top-[60%] right-[15%]" style={{ animationDelay: '1.5s' }} />
-        <div className="noor-sparkle bottom-[25%] left-[40%]" style={{ animationDelay: '3s' }} />
-        <div className="noor-ring w-[400px] h-[400px] top-[-100px] left-[-100px]" />
-        <div className="noor-ring w-[300px] h-[300px] bottom-[-80px] right-[-60px]" style={{ animationDirection: 'reverse', animationDuration: '45s' }} />
-        {/* Background decoration */}
-        <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a853' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
-        
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 relative z-10">
+      <section className="py-16 md:py-20 bg-[#f7f5ef] border-y border-[#e9e3d8]" aria-labelledby="categories-heading">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <AnimateOnScroll animation="fade-up">
-            <div className="text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#d4a853]/10 border border-[#d4a853]/20 mb-5">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#d4a853] animate-pulse" />
-                <span className="text-xs font-semibold tracking-[0.2em] text-[#d4a853] uppercase">Explore Our Collection</span>
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
+              <div>
+                <p className="text-xs font-semibold tracking-[0.28em] text-[#8a6a2f] uppercase mb-2">Browse Quickly</p>
+                <h2 id="categories-heading" className="text-3xl sm:text-4xl font-bold text-slate-900 font-[family-name:var(--font-playfair)]">
+                  Shop by Category
+                </h2>
+                <p className="text-slate-600 text-sm mt-2 max-w-xl">
+                  Pick a category to jump straight to the books you need. Clean layout, easy scan, faster shopping.
+                </p>
               </div>
-              <h2 id="categories-heading" className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white font-[family-name:var(--font-playfair)] mb-3">
-                Shop by Category
-              </h2>
-              <p className="text-slate-400 text-sm max-w-md mx-auto">Discover our curated Islamic library spanning every area of knowledge</p>
+              <Link
+                href="/collections"
+                className="inline-flex items-center gap-2 self-start md:self-auto px-4 py-2.5 rounded-full bg-white border border-slate-200 text-sm font-semibold text-slate-700 hover:border-slate-300 hover:text-slate-900 transition-colors"
+              >
+                See all categories
+                <ChevronRight className="w-4 h-4" />
+              </Link>
             </div>
           </AnimateOnScroll>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
             {mainCategories.map((cat, i) => {
               const Icon = categoryIconMap[cat.slug] || BookMarked;
               return (
-                <AnimateOnScroll key={cat.slug} delay={i * 60} animation="fade-up">
-                  <Link href={`/collections/${cat.slug}`} className="group relative overflow-hidden rounded-2xl bg-white/[0.04] backdrop-blur-sm border border-white/[0.06] hover:bg-white/[0.08] hover:border-[#d4a853]/30 transition-all duration-500 block">
-                    {/* Glow effect on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#d4a853]/0 via-transparent to-[#d4a853]/0 group-hover:from-[#d4a853]/5 group-hover:to-transparent transition-all duration-700" />
-                    
-                    <div className="relative p-5 sm:p-7 flex flex-col items-center text-center">
-                      {/* Icon container */}
-                      <div className="relative mb-5">
-                        <div className="absolute inset-0 bg-[#d4a853]/20 rounded-2xl blur-xl scale-0 group-hover:scale-100 transition-transform duration-500" />
-                        <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-[#d4a853]/20 to-[#d4a853]/5 border border-[#d4a853]/10 flex items-center justify-center group-hover:border-[#d4a853]/30 group-hover:from-[#d4a853]/30 group-hover:to-[#d4a853]/10 transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3">
-                          <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[#d4a853] transition-transform duration-500 group-hover:scale-110" strokeWidth={1.5} />
-                        </div>
+                <AnimateOnScroll key={cat.slug} delay={i * 50} animation="fade-up">
+                  <Link
+                    href={`/collections/${cat.slug}`}
+                    className="group h-full rounded-2xl bg-white border border-slate-200 hover:border-[#d4a853]/40 hover:shadow-[0_12px_35px_rgba(15,23,42,0.08)] transition-all duration-300 p-5 flex flex-col"
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <div className="w-11 h-11 rounded-xl bg-[#f5efe2] border border-[#eadfca] flex items-center justify-center shrink-0">
+                        <Icon className="w-5 h-5 text-[#8a6a2f]" strokeWidth={1.8} />
                       </div>
-                      
-                      {/* Text */}
-                      <h3 className="font-semibold text-white text-sm mb-1.5 group-hover:text-[#d4a853] transition-colors duration-300">{cat.name}</h3>
-                      <span className="text-[11px] text-slate-500 group-hover:text-slate-400 transition-colors font-medium tracking-wide">{cat.count}+ titles</span>
-                      
-                      {/* Arrow indicator */}
-                      <div className="mt-4 flex items-center gap-1 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                        <span className="text-[10px] text-[#d4a853] font-semibold uppercase tracking-wider">Browse</span>
-                        <ArrowRight className="w-3 h-3 text-[#d4a853]" />
-                      </div>
+                      <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
+                        {cat.count}+ titles
+                      </span>
+                    </div>
+
+                    <h3 className="text-base font-semibold text-slate-900 group-hover:text-[#6f5521] transition-colors">
+                      {cat.name}
+                    </h3>
+                    <p className="text-sm text-slate-600 mt-2 line-clamp-2">
+                      {cat.description || `Explore ${cat.name} books and related Islamic knowledge.`}
+                    </p>
+
+                    <div className="mt-auto pt-4 flex items-center gap-1.5 text-sm font-semibold text-[#8a6a2f]">
+                      Browse category
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                     </div>
                   </Link>
                 </AnimateOnScroll>
               );
             })}
           </div>
-          <AnimateOnScroll animation="fade-up" delay={400}>
-            <div className="text-center mt-14">
-              <Link href="/collections" className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#d4a853] text-[#0f172a] text-sm font-bold hover:bg-[#e8c97a] transition-all duration-300 group shadow-lg shadow-[#d4a853]/20 hover:shadow-[#d4a853]/40">
-                View All Categories
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-          </AnimateOnScroll>
         </div>
       </section>
 
