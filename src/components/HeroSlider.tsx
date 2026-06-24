@@ -18,10 +18,10 @@ const slides = [
   },
   {
     badge: "Best Seller",
-    title: "Tib-e-Nabvi — Medicine of the Prophet ﷺ",
+    title: "Ahsan-al-Hawashi — Urdu Tafseer of the Holy Quran",
     description:
-      "Now available in premium edition. A timeless guide to prophetic healing methods.",
-    cta: { text: "View Book", href: "/product/tib-e-nabvi-latest" },
+      "Hafiz Salahuddin Yusuf's finest marginal notes. Arabic Uthmani script with flowing Urdu translation — clarity without clutter.",
+    cta: { text: "View Book", href: "/product/al-quran-al-kareem-ahsan-al-hawashi-imp" },
     arabicText: "وَنُنَزِّلُ مِنَ ٱلْقُرْآنِ مَا هُوَ شِفَآءٌ",
     bgImage: heroImages[1],
   },

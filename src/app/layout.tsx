@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense, lazy } from "react";
 import { Inter, Playfair_Display } from "next/font/google";
 import dynamic from "next/dynamic";
@@ -114,10 +114,6 @@ export const metadata: Metadata = {
     creator: "@mydeenmarket",
   },
   manifest: "/manifest.webmanifest",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
-  ],
   robots: {
     index: true,
     follow: true,
@@ -139,6 +135,13 @@ export const metadata: Metadata = {
       "x-default": siteConfig.url,
     },
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
 };
 
 export default async function RootLayout({

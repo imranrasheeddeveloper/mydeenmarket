@@ -5,10 +5,15 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
+    qualities: [75, 85],
     remotePatterns: [
       {
         protocol: "https",
         hostname: "cdn.shopify.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
       {
         protocol: "https",
@@ -30,13 +35,18 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react"],
   },
   async headers() {
+    const pageCacheControl =
+      process.env.NODE_ENV === "development"
+        ? "no-store"
+        : "public, max-age=0, s-maxage=600, stale-while-revalidate=86400";
+
     return [
       {
         source: "/:path*",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
+            value: pageCacheControl,
           },
           {
             key: "X-Content-Type-Options",
@@ -62,6 +72,33 @@ const nextConfig: NextConfig = {
           {
             key: "Cache-Control",
             value: "no-cache, no-store, must-revalidate",
+          },
+        ],
+      },
+      {
+        source: "/robots.txt",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=3600, stale-while-revalidate=86400",
+          },
+        ],
+      },
+      {
+        source: "/sitemap.xml",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=3600, stale-while-revalidate=86400",
+          },
+        ],
+      },
+      {
+        source: "/sitemap-images.xml",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=3600, stale-while-revalidate=86400",
           },
         ],
       },

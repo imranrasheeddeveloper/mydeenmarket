@@ -50,7 +50,7 @@ export const heroImages = [
   {
     id: 2,
     src: "/uploads/hero/hero-2.webp",
-    alt: "Professional hero composition with rich lighting and Islamic title imagery",
+    alt: "Ahsan-al-Hawashi - Urdu Tafseer of the Holy Quran by Hafiz Salahuddin Yusuf",
     overlayColor: "rgba(9, 20, 33, 0.42)",
   },
   {
