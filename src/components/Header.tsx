@@ -6,7 +6,6 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { siteConfig } from "@/lib/data-types";
 import type { Category, Product } from "@/lib/data-types";
-import CurrencySelector from "@/components/CurrencySelector";
 
 type SearchableProduct = Pick<
   Product,
@@ -260,7 +259,6 @@ export default function Header({
 
             {/* Actions */}
             <div className="flex items-center gap-3 sm:gap-4">
-              <div className="hidden sm:block"><CurrencySelector /></div>
               {session ? (
                 <Link href="/account" className="hidden sm:flex items-center gap-1.5 text-slate-600 hover:text-[#d4a853] transition-colors text-sm">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>

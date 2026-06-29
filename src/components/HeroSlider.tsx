@@ -82,7 +82,7 @@ export default function HeroSlider() {
               priority={i === 0}
               fetchPriority={i === 0 ? "high" : "low"}
               className="object-cover"
-              quality={85}
+              quality={75}
               sizes="100vw"
             />
             {/* Dark overlay for text readability */}

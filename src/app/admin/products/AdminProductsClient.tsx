@@ -64,6 +64,19 @@ export default function AdminProductsClient({
   const [uploadingImage, setUploadingImage] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    mode: "single" | "bulk";
+    ids: string[];
+    names: string[];
+  }>({
+    open: false,
+    mode: "single",
+    ids: [],
+    names: [],
+  });
+  const [deleting, setDeleting] = useState(false);
 
   const isEditMode = Boolean(form.id);
 
@@ -87,6 +100,8 @@ export default function AdminProductsClient({
     new: "bg-emerald-50 text-emerald-700",
     sale: "bg-red-50 text-red-700",
   };
+
+  const allVisibleSelected = filtered.length > 0 && filtered.every((p) => selectedProductIds.includes(p.id));
 
   const resetModal = () => {
     setForm(EMPTY_FORM);
@@ -209,25 +224,74 @@ export default function AdminProductsClient({
     }
   };
 
-  const handleDeleteProduct = async (productId: string) => {
-    const confirmed = window.confirm("Delete this product? This action cannot be undone.");
-    if (!confirmed) return;
+  const openSingleDeleteDialog = (product: Product) => {
+    setDeleteDialog({
+      open: true,
+      mode: "single",
+      ids: [product.id],
+      names: [product.name],
+    });
+  };
 
+  const openBulkDeleteDialog = () => {
+    if (selectedProductIds.length === 0) return;
+    const selectedProducts = allProducts.filter((p) => selectedProductIds.includes(p.id));
+    setDeleteDialog({
+      open: true,
+      mode: "bulk",
+      ids: selectedProducts.map((p) => p.id),
+      names: selectedProducts.map((p) => p.name),
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteDialog.ids.length === 0) return;
+    setDeleting(true);
     try {
-      const response = await fetch(`/api/admin/products/${productId}`, {
-        method: "DELETE",
-      });
+      const response =
+        deleteDialog.mode === "single"
+          ? await fetch(`/api/admin/products/${deleteDialog.ids[0]}`, {
+              method: "DELETE",
+            })
+          : await fetch("/api/admin/products/bulk-delete", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ids: deleteDialog.ids }),
+            });
 
       const payload = await response.json();
       if (!response.ok) {
-        window.alert(payload.error || "Failed to delete product.");
+        window.alert(payload.error || "Failed to delete selected product(s).");
         return;
       }
 
+      const deletedSet = new Set(deleteDialog.ids);
+      setSelectedProductIds((prev) => prev.filter((id) => !deletedSet.has(id)));
+      setDeleteDialog({ open: false, mode: "single", ids: [], names: [] });
       router.refresh();
     } catch {
       window.alert("Request failed. Please try again.");
+    } finally {
+      setDeleting(false);
     }
+  };
+
+  const toggleSelectProduct = (productId: string) => {
+    setSelectedProductIds((prev) =>
+      prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
+    );
+  };
+
+  const toggleSelectAllVisible = () => {
+    if (allVisibleSelected) {
+      const visibleIds = new Set(filtered.map((p) => p.id));
+      setSelectedProductIds((prev) => prev.filter((id) => !visibleIds.has(id)));
+      return;
+    }
+
+    const next = new Set(selectedProductIds);
+    filtered.forEach((p) => next.add(p.id));
+    setSelectedProductIds(Array.from(next));
   };
 
   const handleToggleStock = async (productId: string, nextInStock: boolean) => {
@@ -309,11 +373,42 @@ export default function AdminProductsClient({
         </select>
       </div>
 
+      {selectedProductIds.length > 0 && (
+        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <p className="text-sm text-red-800 font-medium">
+            {selectedProductIds.length} product{selectedProductIds.length > 1 ? "s" : ""} selected
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setSelectedProductIds([])}
+              className="px-3 py-2 border border-red-200 bg-white text-red-700 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors"
+            >
+              Clear Selection
+            </button>
+            <button
+              onClick={openBulkDeleteDialog}
+              className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              Delete Selected
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
+                <th className="px-5 py-3 w-10">
+                  <input
+                    type="checkbox"
+                    aria-label="Select all visible products"
+                    checked={allVisibleSelected}
+                    onChange={toggleSelectAllVisible}
+                    className="w-4 h-4 rounded border-gray-300 text-emerald-700 focus:ring-emerald-600"
+                  />
+                </th>
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-5 py-3">Product</th>
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-5 py-3 hidden md:table-cell">Category</th>
                 <th className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-5 py-3">Price</th>
@@ -325,6 +420,15 @@ export default function AdminProductsClient({
             <tbody className="divide-y divide-gray-50">
               {filtered.map((product) => (
                 <tr key={product.id} className="hover:bg-gray-50/50 transition-colors">
+                  <td className="px-5 py-4 align-top">
+                    <input
+                      type="checkbox"
+                      aria-label={`Select ${product.name}`}
+                      checked={selectedProductIds.includes(product.id)}
+                      onChange={() => toggleSelectProduct(product.id)}
+                      className="w-4 h-4 rounded border-gray-300 text-emerald-700 focus:ring-emerald-600"
+                    />
+                  </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       {product.imageUrl ? (
@@ -397,7 +501,7 @@ export default function AdminProductsClient({
                         </svg>
                       </button>
                       <button
-                        onClick={() => handleDeleteProduct(product.id)}
+                        onClick={() => openSingleDeleteDialog(product)}
                         className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Delete"
                       >
@@ -654,6 +758,53 @@ export default function AdminProductsClient({
                   {submitting ? (isEditMode ? "Saving..." : "Adding...") : (isEditMode ? "Save Changes" : "Add Product")}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteDialog.open && (
+        <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => !deleting && setDeleteDialog({ open: false, mode: "single", ids: [], names: [] })}
+          />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+            <div className="px-6 py-5 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-gray-900">Confirm Delete</h2>
+              <p className="text-sm text-gray-600 mt-1">
+                {deleteDialog.mode === "single"
+                  ? "This product will be permanently deleted."
+                  : `${deleteDialog.ids.length} products will be permanently deleted.`}
+              </p>
+            </div>
+            <div className="px-6 py-4">
+              <p className="text-sm text-gray-700 mb-2">You are deleting:</p>
+              <ul className="max-h-40 overflow-auto bg-gray-50 border border-gray-100 rounded-lg p-3 text-sm text-gray-800 space-y-1">
+                {deleteDialog.names.slice(0, 8).map((name) => (
+                  <li key={name} className="truncate">• {name}</li>
+                ))}
+                {deleteDialog.names.length > 8 && (
+                  <li className="text-gray-500">+ {deleteDialog.names.length - 8} more</li>
+                )}
+              </ul>
+              <p className="text-xs text-red-700 mt-3">This action cannot be undone.</p>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3">
+              <button
+                onClick={() => setDeleteDialog({ open: false, mode: "single", ids: [], names: [] })}
+                disabled={deleting}
+                className="px-4 py-2 border border-gray-200 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 disabled:opacity-60"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={deleting}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium disabled:opacity-60"
+              >
+                {deleting ? "Deleting..." : deleteDialog.mode === "single" ? "Delete Product" : `Delete ${deleteDialog.ids.length} Products`}
+              </button>
             </div>
           </div>
         </div>
