@@ -12,11 +12,11 @@ export type SearchableProduct = Pick<
  * - weighted keys for relevance ranking
  * - supports multi-term queries
  */
-export function searchProducts(
+export function searchProducts<T extends SearchableProduct>(
   query: string,
-  products: SearchableProduct[],
+  products: T[],
   limit?: number
-): SearchableProduct[] {
+): T[] {
   const cleanedQuery = query.trim();
   if (!cleanedQuery) return [];
 
@@ -45,7 +45,7 @@ export function searchProducts(
     .filter(Boolean);
 
   const seen = new Set<string>();
-  const ranked: SearchableProduct[] = [];
+  const ranked: T[] = [];
 
   // Search full query first for best phrase relevance.
   for (const result of fuse.search(cleanedQuery)) {
