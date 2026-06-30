@@ -61,7 +61,7 @@ export default function TermsPage() {
 
           <h2 className="text-2xl font-bold text-[#0f172a] mt-8 mb-4">6. Product Information</h2>
           <p className="text-slate-700 leading-relaxed">
-            We strive to provide accurate descriptions and images of all products. However, we do not warrant that product descriptions, pricing, or other content is accurate, complete, reliable, current, or error-free. If a product offered by {siteConfig.name} is not as described, your sole remedy is to return it in unused condition.
+            We strive to provide accurate descriptions and images of all products. However, we do not warrant that product descriptions, pricing, or other content is accurate, complete, reliable, current, or error-free. If a product offered by {siteConfig.name} is not as described, your sole remedy is to request an exchange in line with our Shipment and Exchange Policy.
           </p>
 
           <h2 className="text-2xl font-bold text-[#0f172a] mt-8 mb-4">7. Links</h2>
