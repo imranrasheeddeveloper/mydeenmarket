@@ -27,8 +27,10 @@ services:
       - NEXTAUTH_URL=http://localhost:3000
       - NEXTAUTH_SECRET=change-this-to-a-secure-random-string
       - DATABASE_URL=postgresql://mydeenmarket:mydeenmarket@db:5432/mydeenmarket?schema=public
+      - PRODUCT_UPLOADS_DIR=/app/uploads/products
     volumes:
       - ./prisma:/app/prisma
+      - ./uploads:/app/uploads
     restart: unless-stopped
 
 volumes:
