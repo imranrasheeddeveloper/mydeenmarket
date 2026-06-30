@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
 const BASE_URL = "https://mydeenmarket.com";
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [products, categories, collections] = await Promise.all([
@@ -15,7 +16,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     prisma.collection.findMany({ select: { slug: true } }).catch(() => []),
   ]);
 
-  const now = new Date();
+  const latestProductDate = products[0]?.createdAt || null;
+  const now = latestProductDate || new Date();
   const categoryLastModified = new Map<string, Date>();
   for (const product of products) {
     const existing = categoryLastModified.get(product.categorySlug);
@@ -75,18 +77,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  const categoryPages: MetadataRoute.Sitemap = categories.map((cat) => ({
-    url: `${BASE_URL}/collections/${cat.slug}`,
-    lastModified: categoryLastModified.get(cat.slug) || now,
+  const taxonomySlugs = Array.from(
+    new Set([...categories.map((c) => c.slug), ...collections.map((c) => c.slug)])
+  );
+
+  const taxonomyPages: MetadataRoute.Sitemap = taxonomySlugs.map((slug) => ({
+    url: `${BASE_URL}/collections/${slug}`,
+    lastModified: categoryLastModified.get(slug) || now,
     changeFrequency: "daily" as const,
     priority: 0.9,
-  }));
-
-  const collectionPages: MetadataRoute.Sitemap = collections.map((col) => ({
-    url: `${BASE_URL}/collections/${col.slug}`,
-    lastModified: now,
-    changeFrequency: "daily" as const,
-    priority: 0.85,
   }));
 
   const productPages: MetadataRoute.Sitemap = products.map((product) => ({
@@ -96,5 +95,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...categoryPages, ...collectionPages, ...productPages];
+  return [...staticPages, ...taxonomyPages, ...productPages];
 }

@@ -75,7 +75,8 @@ export default function robots(): MetadataRoute.Robots {
     sitemap: [
       "https://mydeenmarket.com/sitemap.xml",
       "https://mydeenmarket.com/sitemap-images.xml",
+      "https://mydeenmarket.com/product-feed.xml",
     ],
-    host: "https://mydeenmarket.com",
+    host: "mydeenmarket.com",
   };
 }

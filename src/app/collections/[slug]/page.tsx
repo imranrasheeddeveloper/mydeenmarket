@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
-import { getCategoryBySlug, getProductsByCategory, getCategories } from "@/lib/data";
+import { getCategoryBySlug, getProductsByCategory, getCategories, getAllCategorySlugs } from "@/lib/data";
 import {
   generatePageMetadata,
   generateBreadcrumbSchema,
@@ -11,7 +11,12 @@ import {
 
 type Params = Promise<{ slug: string }>;
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const slugs = await getAllCategorySlugs();
+  return slugs.map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;

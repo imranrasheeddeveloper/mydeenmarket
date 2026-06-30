@@ -5,7 +5,13 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import ProductCard from "@/components/ProductCard";
 import ProductReviews from "@/components/ProductReviews";
-import { getProductBySlug, getProductsByCategory, getProductReviews, formatPrice } from "@/lib/data";
+import {
+  getProductBySlug,
+  getProductsByCategory,
+  getProductReviews,
+  formatPrice,
+  getAllProductSlugs,
+} from "@/lib/data";
 import { generatePageMetadata, generateProductSchema, generateBreadcrumbSchema } from "@/lib/seo";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -15,7 +21,12 @@ import ProductViewTracker from "@/components/ProductViewTracker";
 
 type Params = Promise<{ slug: string }>;
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const slugs = await getAllProductSlugs();
+  return slugs.map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;
