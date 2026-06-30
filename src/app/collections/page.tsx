@@ -3,7 +3,7 @@ import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import { getProducts, getCategories } from "@/lib/data";
 import { generatePageMetadata, generateBreadcrumbSchema, generateCollectionItemListSchema } from "@/lib/seo";
-
+import { searchProducts } from "@/lib/search-utils";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
@@ -72,6 +72,11 @@ export default async function CollectionsPage({
       }
     );
   }
+  // Use improved search with relevance scoring
+  if (query) {
+    filtered = searchProducts(params.q || "", products);
+  }
+  
   if (filter === "bestseller") {
     filtered = filtered.filter((p) => p.badge === "bestseller");
   } else if (filter === "new") {

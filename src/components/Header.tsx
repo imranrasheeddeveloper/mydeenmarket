@@ -4,13 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { siteConfig } from "@/lib/data-types";
-import type { Category, Product } from "@/lib/data-types";
-
-type SearchableProduct = Pick<
-  Product,
-  "id" | "slug" | "name" | "author" | "category" | "categorySlug" | "vendor" | "description" | "features"
->;
+import type { Category } from "@/lib/data-types";
+import { searchProducts } from "@/lib/search-utils";
+import type { SearchableProduct } from "@/lib/search-utils";
 
 export default function Header({
   categories = [],
@@ -19,6 +17,7 @@ export default function Header({
   categories?: Category[];
   searchableProducts?: SearchableProduct[];
 }) {
+  const router = useRouter();
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -26,6 +25,8 @@ export default function Header({
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileSearchQuery, setMobileSearchQuery] = useState("");
+  const [activeDesktopIndex, setActiveDesktopIndex] = useState(-1);
+  const [activeMobileIndex, setActiveMobileIndex] = useState(-1);
   const searchRef = useRef<HTMLDivElement>(null);
   const mobileSearchRef = useRef<HTMLDivElement>(null);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -73,51 +74,133 @@ export default function Header({
     ? popularSearches.filter(s => s.toLowerCase().includes(searchQuery.toLowerCase()))
     : popularSearches;
 
-  const desktopTerms = searchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
-  const mobileTerms = mobileSearchQuery.toLowerCase().trim().split(/\s+/).filter(Boolean);
-
-  const matchesTerms = (haystack: string, terms: string[]) =>
-    terms.every((term) => haystack.includes(term));
-
-  const matchedProducts = desktopTerms.length > 0
-    ? searchableProducts
-        .filter((p) => {
-          const searchable = [
-            p.name,
-            p.slug,
-            p.author,
-            p.category,
-            p.categorySlug,
-            p.vendor,
-            p.description,
-            ...(p.features || []),
-          ]
-            .join(" ")
-            .toLowerCase();
-          return matchesTerms(searchable, desktopTerms);
-        })
-        .slice(0, 6)
+  const matchedProducts = searchQuery.trim() 
+    ? searchProducts(searchQuery, searchableProducts, 6)
     : [];
 
-  const matchedMobileProducts = mobileTerms.length > 0
-    ? searchableProducts
-        .filter((p) => {
-          const searchable = [
-            p.name,
-            p.slug,
-            p.author,
-            p.category,
-            p.categorySlug,
-            p.vendor,
-            p.description,
-            ...(p.features || []),
-          ]
-            .join(" ")
-            .toLowerCase();
-          return matchesTerms(searchable, mobileTerms);
-        })
-        .slice(0, 6)
+  const matchedMobileProducts = mobileSearchQuery.trim() 
+    ? searchProducts(mobileSearchQuery, searchableProducts, 6)
     : [];
+
+  const desktopSelectableItems = [
+    ...matchedProducts.map((product) => ({ href: `/product/${product.slug}`, type: "product" as const })),
+    ...filteredSearches.map((term) => ({ href: `/collections?q=${encodeURIComponent(term)}`, type: "popular" as const })),
+  ];
+
+  const mobileSelectableItems = [
+    ...matchedMobileProducts.map((product) => ({ href: `/product/${product.slug}`, type: "product" as const })),
+    ...popularSearches.map((term) => ({ href: `/collections?q=${encodeURIComponent(term)}`, type: "popular" as const })),
+  ];
+
+  useEffect(() => {
+    setActiveDesktopIndex(-1);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setActiveMobileIndex(-1);
+  }, [mobileSearchQuery]);
+
+  const escapeRegex = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  const highlightMatches = (text: string, query: string) => {
+    const terms = query
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .map((term) => term.trim())
+      .filter(Boolean);
+
+    if (!terms.length) return text;
+
+    const pattern = terms.map(escapeRegex).join("|");
+    if (!pattern) return text;
+
+    const regex = new RegExp(`(${pattern})`, "ig");
+    return text.split(regex).map((part, idx) => {
+      const isMatch = terms.some((term) => part.toLowerCase() === term);
+      return isMatch ? (
+        <mark key={`${part}-${idx}`} className="bg-[#d4a853]/20 text-slate-900 rounded px-0.5">
+          {part}
+        </mark>
+      ) : (
+        <span key={`${part}-${idx}`}>{part}</span>
+      );
+    });
+  };
+
+  const handleDesktopKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!desktopSelectableItems.length) {
+      if (e.key === "Escape") setSearchOpen(false);
+      return;
+    }
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setSearchOpen(true);
+      setActiveDesktopIndex((prev) => (prev + 1) % desktopSelectableItems.length);
+      return;
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSearchOpen(true);
+      setActiveDesktopIndex((prev) => (prev <= 0 ? desktopSelectableItems.length - 1 : prev - 1));
+      return;
+    }
+
+    if (e.key === "Enter" && activeDesktopIndex >= 0) {
+      e.preventDefault();
+      const target = desktopSelectableItems[activeDesktopIndex];
+      setSearchOpen(false);
+      setSearchQuery("");
+      setActiveDesktopIndex(-1);
+      router.push(target.href);
+      return;
+    }
+
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setSearchOpen(false);
+      setActiveDesktopIndex(-1);
+    }
+  };
+
+  const handleMobileKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!mobileSelectableItems.length) {
+      if (e.key === "Escape") setMobileSearchOpen(false);
+      return;
+    }
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setMobileSearchOpen(true);
+      setActiveMobileIndex((prev) => (prev + 1) % mobileSelectableItems.length);
+      return;
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setMobileSearchOpen(true);
+      setActiveMobileIndex((prev) => (prev <= 0 ? mobileSelectableItems.length - 1 : prev - 1));
+      return;
+    }
+
+    if (e.key === "Enter" && activeMobileIndex >= 0) {
+      e.preventDefault();
+      const target = mobileSelectableItems[activeMobileIndex];
+      setMobileSearchOpen(false);
+      setMobileSearchQuery("");
+      setActiveMobileIndex(-1);
+      router.push(target.href);
+      return;
+    }
+
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setMobileSearchOpen(false);
+      setActiveMobileIndex(-1);
+    }
+  };
 
   const mainCategories = categories.slice(0, 8);
 
@@ -138,12 +221,8 @@ export default function Header({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-[72px] gap-4">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 shrink-0" aria-label="MyDeenMarket Home">
-              <Image src="/logo-icon.svg" alt="MyDeenMarket logo" width={36} height={36} className="rounded-lg" priority />
-              <div>
-                <span className="text-lg font-bold text-slate-900 tracking-tight">MyDeenMarket</span>
-                <span className="block text-[10px] font-semibold tracking-[0.2em] text-[#c9a246] uppercase -mt-0.5">Islamic Books</span>
-              </div>
+            <Link href="/" className="flex items-center shrink-0" aria-label="MyDeenMarket Home">
+              <Image src="/logo.svg" alt="MyDeenMarket logo" width={210} height={56} className="h-10 md:h-11 w-auto" priority />
             </Link>
 
             {/* Search */}
@@ -159,6 +238,7 @@ export default function Header({
                   aria-label="Search products"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleDesktopKeyDown}
                   onFocus={() => setSearchOpen(true)}
                   autoComplete="off"
                 />
@@ -178,16 +258,21 @@ export default function Header({
                           <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-3">Products</h4>
                           {matchedProducts.length > 0 ? (
                             <div className="space-y-1">
-                              {matchedProducts.map((product) => (
+                              {matchedProducts.map((product, index) => (
                                 <Link
                                   key={product.id}
                                   href={`/product/${product.slug}`}
-                                  onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
-                                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+                                  onMouseEnter={() => setActiveDesktopIndex(index)}
+                                  onClick={() => { setSearchOpen(false); setSearchQuery(""); setActiveDesktopIndex(-1); }}
+                                  className={`flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+                                    activeDesktopIndex === index ? "bg-[#d4a853]/10" : "hover:bg-slate-50"
+                                  }`}
                                 >
                                   <div className="min-w-0">
-                                    <p className="text-sm text-slate-800 truncate">{product.name}</p>
-                                    <p className="text-xs text-slate-500 truncate">{product.category} {product.author ? `• ${product.author}` : ""}</p>
+                                    <p className="text-sm text-slate-800 truncate">{highlightMatches(product.name, searchQuery)}</p>
+                                    <p className="text-xs text-slate-500 truncate">
+                                      {highlightMatches(product.category, searchQuery)} {product.author ? <><span>• </span>{highlightMatches(product.author, searchQuery)}</> : ""}
+                                    </p>
                                   </div>
                                   <span className="text-xs text-[#d4a853]">View</span>
                                 </Link>
@@ -204,17 +289,25 @@ export default function Header({
                         Popular Searches
                       </h4>
                       <div className="flex flex-wrap gap-2">
-                        {filteredSearches.map((term) => (
+                        {filteredSearches.map((term, idx) => {
+                          const desktopIndex = matchedProducts.length + idx;
+                          return (
                           <Link
                             key={term}
                             href={`/collections?q=${encodeURIComponent(term)}`}
-                            onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-50 hover:bg-[#d4a853]/10 border border-slate-100 hover:border-[#d4a853]/30 rounded-full text-sm text-slate-600 hover:text-[#0f172a] transition-all group"
+                            onMouseEnter={() => setActiveDesktopIndex(desktopIndex)}
+                            onClick={() => { setSearchOpen(false); setSearchQuery(""); setActiveDesktopIndex(-1); }}
+                            className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 border rounded-full text-sm transition-all group ${
+                              activeDesktopIndex === desktopIndex
+                                ? "bg-[#d4a853]/10 border-[#d4a853]/30 text-[#0f172a]"
+                                : "bg-slate-50 hover:bg-[#d4a853]/10 border-slate-100 hover:border-[#d4a853]/30 text-slate-600 hover:text-[#0f172a]"
+                            }`}
                           >
                             <svg className="w-3 h-3 text-slate-300 group-hover:text-[#d4a853] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                            {term}
+                            {highlightMatches(term, searchQuery)}
                           </Link>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
 
@@ -340,6 +433,7 @@ export default function Header({
               aria-label="Search products"
               value={mobileSearchQuery}
               onChange={(e) => setMobileSearchQuery(e.target.value)}
+              onKeyDown={handleMobileKeyDown}
               onFocus={() => setMobileSearchOpen(true)}
               autoComplete="off"
             />
@@ -355,15 +449,16 @@ export default function Header({
                     <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-2">Products</h4>
                     {matchedMobileProducts.length > 0 ? (
                       <div className="space-y-1">
-                        {matchedMobileProducts.map((product) => (
+                        {matchedMobileProducts.map((product, index) => (
                           <Link
                             key={product.id}
                             href={`/product/${product.slug}`}
-                            onClick={() => { setMobileSearchOpen(false); setMobileSearchQuery(""); }}
-                            className="block px-2.5 py-2 rounded-lg hover:bg-slate-50"
+                            onMouseEnter={() => setActiveMobileIndex(index)}
+                            onClick={() => { setMobileSearchOpen(false); setMobileSearchQuery(""); setActiveMobileIndex(-1); }}
+                            className={`block px-2.5 py-2 rounded-lg ${activeMobileIndex === index ? "bg-[#d4a853]/10" : "hover:bg-slate-50"}`}
                           >
-                            <p className="text-sm text-slate-700 truncate">{product.name}</p>
-                            <p className="text-xs text-slate-500 truncate">{product.category}</p>
+                            <p className="text-sm text-slate-700 truncate">{highlightMatches(product.name, mobileSearchQuery)}</p>
+                            <p className="text-xs text-slate-500 truncate">{highlightMatches(product.category, mobileSearchQuery)}</p>
                           </Link>
                         ))}
                       </div>
@@ -374,9 +469,24 @@ export default function Header({
                 )}
                 <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 mb-2">Popular Searches</h4>
                 <div className="flex flex-wrap gap-1.5">
-                  {popularSearches.map((term) => (
-                    <Link key={term} href={`/collections?q=${encodeURIComponent(term)}`} onClick={() => { setMobileSearchOpen(false); setMobileSearchQuery(""); }} className="px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-full text-xs text-slate-600 hover:bg-[#d4a853]/10 hover:border-[#d4a853]/30 transition-all">{term}</Link>
-                  ))}
+                  {popularSearches.map((term, idx) => {
+                    const mobileIndex = matchedMobileProducts.length + idx;
+                    return (
+                      <Link
+                        key={term}
+                        href={`/collections?q=${encodeURIComponent(term)}`}
+                        onMouseEnter={() => setActiveMobileIndex(mobileIndex)}
+                        onClick={() => { setMobileSearchOpen(false); setMobileSearchQuery(""); setActiveMobileIndex(-1); }}
+                        className={`px-3 py-1.5 border rounded-full text-xs transition-all ${
+                          activeMobileIndex === mobileIndex
+                            ? "bg-[#d4a853]/10 border-[#d4a853]/30 text-slate-700"
+                            : "bg-slate-50 border-slate-100 text-slate-600 hover:bg-[#d4a853]/10 hover:border-[#d4a853]/30"
+                        }`}
+                      >
+                        {highlightMatches(term, mobileSearchQuery)}
+                      </Link>
+                    );
+                  })}
                 </div>
                 <h4 className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400 mt-3 mb-2">Categories</h4>
                 <div className="grid grid-cols-2 gap-1">
@@ -398,7 +508,7 @@ export default function Header({
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
           <nav className="absolute inset-y-0 left-0 w-80 max-w-[85vw] bg-white shadow-2xl overflow-y-auto" aria-label="Mobile navigation">
             <div className="flex items-center justify-between p-5 border-b border-slate-100">
-              <span className="text-lg font-bold text-slate-900 flex items-center gap-2"><Image src="/logo-icon.svg" alt="" width={28} height={28} className="rounded-md" />MyDeen<span className="text-[#d4a853]">Market</span></span>
+              <Image src="/logo.svg" alt="MyDeenMarket logo" width={180} height={48} className="h-9 w-auto" />
               <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-slate-400" aria-label="Close menu">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>

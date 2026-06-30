@@ -1,30 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 80" fill="none">
-  <!-- Book + Arch Mark -->
-  <g>
-    <!-- Open book base -->
-    <path d="M18 58 C18 58 30 52 40 52 C50 52 62 58 62 58" stroke="#d4a853" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-    <!-- Left page -->
-    <path d="M18 58 L18 26 C18 26 28 22 40 24" stroke="#d4a853" stroke-width="2" fill="none"/>
-    <!-- Right page -->
-    <path d="M62 58 L62 26 C62 26 52 22 40 24" stroke="#d4a853" stroke-width="2" fill="none"/>
-    <!-- Spine -->
-    <line x1="40" y1="24" x2="40" y2="52" stroke="#d4a853" stroke-width="1.5" opacity="0.4"/>
-    <!-- Islamic arch rising from book -->
-    <path d="M24 42 L24 28 Q24 14 40 12 Q56 14 56 28 L56 42" stroke="#d4a853" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-    <!-- Inner arch -->
-    <path d="M29 42 L29 30 Q29 19 40 17 Q51 19 51 30 L51 42" stroke="#d4a853" stroke-width="1.2" fill="none" opacity="0.35"/>
-    <!-- Crescent moon -->
-    <path d="M36 27 A6 6 0 1 1 36 39 A4.5 4.5 0 1 0 36 27Z" fill="#d4a853"/>
-    <!-- Star -->
-    <polygon points="48,28 49.2,31.5 53,31.5 50,33.8 51,37 48,35 45,37 46,33.8 43,31.5 46.8,31.5" fill="#d4a853" opacity="0.9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 98" fill="none" role="img" aria-label="MyDeenMarket logo">
+  <defs>
+    <linearGradient id="mdm-gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4e0aa"/>
+      <stop offset="0.45" stop-color="#d4a853"/>
+      <stop offset="1" stop-color="#9e6e22"/>
+    </linearGradient>
+    <linearGradient id="mdm-teal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f6c5d"/>
+      <stop offset="1" stop-color="#0a3a34"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(10 8)">
+    <circle cx="40" cy="40" r="36" fill="url(#mdm-teal)"/>
+    <circle cx="40" cy="40" r="31" stroke="url(#mdm-gold)" stroke-width="2.2" opacity="0.9"/>
+
+    <path d="M26 56V33C26 22.4 32.4 16 40 14.6C47.6 16 54 22.4 54 33V56" stroke="url(#mdm-gold)" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M18 57C18 57 28 51.5 40 51.5C52 51.5 62 57 62 57" stroke="url(#mdm-gold)" stroke-width="2.7" stroke-linecap="round"/>
+    <path d="M23 57V29.5C27.8 27.4 34.1 27.8 40 31.2" stroke="url(#mdm-gold)" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M57 57V29.5C52.2 27.4 45.9 27.8 40 31.2" stroke="url(#mdm-gold)" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M34.5 25.2a5.8 5.8 0 1 1 0 11.6a4.3 4.3 0 1 0 0-11.6Z" fill="url(#mdm-gold)"/>
+    <path d="M47.4 25.6l0.9 1.9l2.1 0.3l-1.5 1.4l0.4 2.1l-1.9-1.1l-1.9 1.1l0.4-2.1l-1.5-1.4l2.1-0.3l0.9-1.9Z" fill="url(#mdm-gold)"/>
   </g>
-  <!-- Wordmark -->
-  <g>
-    <text x="72" y="38" font-family="Georgia, 'Times New Roman', serif" font-size="24" font-weight="700" fill="#0f172a" letter-spacing="-0.5">
-      MyDeen<tspan fill="#d4a853">Market</tspan>
+
+  <g transform="translate(104 12)">
+    <text x="0" y="40" font-family="Georgia, Times New Roman, serif" font-size="40" font-weight="700" fill="#0f202d" letter-spacing="-0.9">
+      MyDeen<tspan fill="#a9762b">Market</tspan>
     </text>
-    <text x="72" y="54" font-family="Arial, Helvetica, sans-serif" font-size="8.5" font-weight="600" fill="#d4a853" letter-spacing="4" opacity="0.8">
-      ISLAMIC BOOKS
+    <path d="M2 50H216" stroke="#d7b063" stroke-width="1.3" opacity="0.55"/>
+    <text x="3" y="66" font-family="Trebuchet MS, Arial, sans-serif" font-size="10.5" font-weight="700" fill="#0f5d50" letter-spacing="3.7">
+      ISLAMIC BOOKS AND ESSENTIALS
     </text>
   </g>
 </svg>

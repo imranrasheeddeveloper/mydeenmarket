@@ -21,12 +21,8 @@ export default async function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
           {/* About Column */}
           <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2.5 mb-4" aria-label="MyDeenMarket Home">
-              <Image src="/logo-icon.svg" alt="MyDeenMarket logo" width={36} height={36} className="rounded-lg" />
-              <div>
-                <span className="text-lg font-bold text-white">MyDeenMarket</span>
-                <span className="block text-[10px] font-semibold tracking-[0.2em] text-[#d4a853] uppercase -mt-0.5">Islamic Books</span>
-              </div>
+            <Link href="/" className="inline-flex items-center mb-4" aria-label="MyDeenMarket Home">
+              <Image src="/logo.svg" alt="MyDeenMarket logo" width={220} height={60} className="h-11 w-auto" />
             </Link>
             <p className="text-sm text-slate-400 leading-relaxed mb-6">
               Your trusted Islamic bookstore. Bringing authentic Islamic knowledge through books,

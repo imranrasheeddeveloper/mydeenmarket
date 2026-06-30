@@ -207,7 +207,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
   return rows.map(mapProduct);
 }
 
-export async function getSearchableProducts(limit = 150): Promise<Product[]> {
+export async function getSearchableProducts(limit = 400): Promise<Product[]> {
   const rows = await withBuildFallback(
     () =>
       prisma.product.findMany({

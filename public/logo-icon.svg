@@ -1,19 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="14" fill="#d4a853"/>
-  <!-- Open book base -->
-  <path d="M14 48 C14 48 24 43 32 43 C40 43 50 48 50 48" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-  <!-- Left page -->
-  <path d="M14 48 L14 22 C14 22 22 18 32 20" stroke="#fff" stroke-width="2" fill="none"/>
-  <!-- Right page -->
-  <path d="M50 48 L50 22 C50 22 42 18 32 20" stroke="#fff" stroke-width="2" fill="none"/>
-  <!-- Spine -->
-  <line x1="32" y1="20" x2="32" y2="43" stroke="#fff" stroke-width="1.2" opacity="0.3"/>
-  <!-- Islamic arch -->
-  <path d="M19 36 L19 24 Q19 12 32 10 Q45 12 45 24 L45 36" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-  <!-- Inner arch -->
-  <path d="M23 36 L23 26 Q23 17 32 15 Q41 17 41 26 L41 36" stroke="#fff" stroke-width="1" fill="none" opacity="0.3"/>
-  <!-- Crescent -->
-  <path d="M28 24 A5 5 0 1 1 28 34 A3.8 3.8 0 1 0 28 24Z" fill="#fff"/>
-  <!-- Star -->
-  <polygon points="39,24.5 40,27.3 43,27.3 40.6,29.2 41.4,32 39,30.3 36.6,32 37.4,29.2 35,27.3 38,27.3" fill="#fff" opacity="0.9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="MyDeenMarket icon">
+  <defs>
+    <linearGradient id="mdm-icon-gold" x1="7" y1="7" x2="57" y2="57" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4e0aa"/>
+      <stop offset="0.45" stop-color="#d4a853"/>
+      <stop offset="1" stop-color="#9e6e22"/>
+    </linearGradient>
+    <linearGradient id="mdm-icon-teal" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0e6a5c"/>
+      <stop offset="1" stop-color="#0a3a34"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="14" fill="url(#mdm-icon-teal)"/>
+
+  <path d="M21 46V30.5C21 22.5 25.8 17.4 32 16.2C38.2 17.4 43 22.5 43 30.5V46" stroke="url(#mdm-icon-gold)" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M14 47.5C14 47.5 22 43.2 32 43.2C42 43.2 50 47.5 50 47.5" stroke="url(#mdm-icon-gold)" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M17.5 47.5V27.6C21.2 26 26 26.3 32 29.1" stroke="url(#mdm-icon-gold)" stroke-width="2.1" stroke-linecap="round"/>
+  <path d="M46.5 47.5V27.6C42.8 26 38 26.3 32 29.1" stroke="url(#mdm-icon-gold)" stroke-width="2.1" stroke-linecap="round"/>
+  <path d="M27.2 25.2a4.8 4.8 0 1 1 0 9.6a3.6 3.6 0 1 0 0-9.6Z" fill="url(#mdm-icon-gold)"/>
+  <path d="M38.6 25.6l0.8 1.6l1.8 0.3l-1.3 1.2l0.3 1.8l-1.6-0.9l-1.6 0.9l0.3-1.8l-1.3-1.2l1.8-0.3l0.8-1.6Z" fill="url(#mdm-icon-gold)"/>
 </svg>
